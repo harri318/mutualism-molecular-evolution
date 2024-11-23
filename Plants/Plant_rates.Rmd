@@ -1,0 +1,1712 @@
+---
+title: "Plant_dnds_analysis"
+author: "Tia Harrison"
+date: "08/08/2022"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Load the packages 
+
+```{r packages}
+library(tidyverse)
+library(multcomp)
+library(tidyverse)
+library(nationalparkcolors)
+library(coin)
+library(ggpubr)
+library(rstatix)
+library(phytools)
+library(geiger)
+library(ape)
+library(forcats)
+library(ggh4x)
+library(plotrix)
+library(qqman)
+library(lsmeans)
+library(lme4)
+library(ggsignif)
+library(UpSetR)
+library(ggtree)
+library(treeio)
+library(TDbook)
+library(ggstar)
+
+```
+
+
+## Load the new dataset and explore
+Data set has been cleaned up in the previous script. 
+Some genes may have to be removed later on if their dnds value is higher than expected. If dnds value is higher than 10 remove that gene because probably an error in assembly or annotation. 
+
+If the gene was over 10 for one of the species in the pair should it be removed from the analysis for the other species in the pair? Depends on the analysis
+
+This data is based on single copy orthologs in the genomes. This would be more conservative that taking in paralogs into the data. Harder to figure out what to do with the paralogs anyways. Especially if you want to get a genome wide average dnds rate. 
+
+```{r data}
+# Colour palette for plants (darker orange)
+mut_col<-park_palette("Denali") #4
+non_col<-park_palette("ChannelIslands") # 2
+
+# Load the data 
+plant_dnds<-read_csv("Plant_PAML_results_NEW.csv")
+
+# Change the dnds ratio to a numeric value 
+plant_dnds <- plant_dnds %>%
+  mutate(dnds=as.numeric(dnds))
+
+plant_dnds %>%
+  group_by(Gene) %>%
+  tally()
+# 3,548 genes total 
+
+# How many genes were above 1 
+plant_dnds%>%
+  filter(dnds>10) %>%
+  distinct(Gene) # 1831 
+
+# How many orthologs total
+gene_no1<-plant_dnds %>%
+  group_by(Gene) %>%
+  tally()
+# 3,548 genes total 
+gene_no1
+# How many found in all 12 species 
+gene_no1 %>%
+  filter(n==12) #389???  
+
+
+# Before filtering for genes under 10 
+# How many orthologs total
+gene_no_test<-plant_dnds %>%
+  group_by(Gene) %>%
+  tally()
+gene_no_test
+# 3,548 genes total 
+
+# How many found in all 12 species before filtering  
+gene_no_test %>%
+  filter(n==12) #389 genes 
+
+
+# Remove abnormally high dnds values 
+plant_dnds2<-plant_dnds%>%
+  filter(dnds<10)
+plant_dnds2 # 18,565  genes 
+# But this is just removing the gene from each individual species (and may want to remove for each species pairs later on) 
+
+# See how many data points are in each pair
+# This combines both species in the pair so it will be roughly double the number of genes 
+plant_dnds2%>% 
+  group_by(Pair)%>%
+  tally()
+
+# How many orthologs total
+gene_no<-plant_dnds2 %>%
+  group_by(Gene) %>%
+  tally()
+# 3,521 genes total 
+
+# How many found in all 12 species 
+gene_no %>%
+  filter(n==12) #210 
+```
+
+## Add in the other data 
+Introduced ranges, ploidy, human uses etc. 
+
+```{r}
+# Range data 
+plant_dnds2_meta<- plant_dnds2 %>% 
+  mutate(Range=case_when(Species=="Mimosa_aculeaticarpa" ~ 0, 
+                            Species=="Dalea_mollis" ~ 0, 
+                            Species== "Senna_occidentalis" ~ 48,
+                            Species=="Senna_didymobotrya" ~ 20,
+                            Species=="Senna_italica" ~ 2,
+                            Species=="Senna_barclayana" ~ 0,
+                            Species=="Calliandra_eriophylla" ~ 0 ,
+                            Species=="Dalea_mollissima" ~ 0,
+                            Species=="Peltophorum_africanum" ~ 7,
+                            Species=="Peltophorum_dubium" ~ 6 ,
+                            Species=="Mimosa_grahamii" ~ 0 ,
+                            Species=="Calliandra_humilis" ~ 0
+                            )) 
+
+# Human uses 
+plant_dnds2_meta<- plant_dnds2_meta %>% 
+  mutate(Human=case_when(Species=="Mimosa_aculeaticarpa" ~ 0, 
+                            Species=="Dalea_mollis" ~ 1, 
+                            Species== "Senna_occidentalis" ~ 6,
+                            Species=="Senna_didymobotrya" ~ 5,
+                            Species=="Senna_italica" ~ 1,
+                            Species=="Senna_barclayana" ~ 0,
+                            Species=="Calliandra_eriophylla" ~ 0 ,
+                            Species=="Dalea_mollissima" ~ 1,
+                            Species=="Peltophorum_africanum" ~ 3,
+                            Species=="Peltophorum_dubium" ~ 3 ,
+                            Species=="Mimosa_grahamii" ~ 0 ,
+                            Species=="Calliandra_humilis" ~ 0
+                            )) 
+
+# Invasive category 
+plant_dnds2_meta<- plant_dnds2_meta %>% 
+  mutate(Invasive=case_when(Species=="Mimosa_aculeaticarpa" ~ "N", 
+                            Species=="Dalea_mollis" ~ "N", 
+                            Species== "Senna_occidentalis" ~ "Y",
+                            Species=="Senna_didymobotrya" ~ "Y",
+                            Species=="Senna_italica" ~ "Y",
+                            Species=="Senna_barclayana" ~ "N",
+                            Species=="Calliandra_eriophylla" ~ "N" ,
+                            Species=="Dalea_mollissima" ~ "N",
+                            Species=="Peltophorum_africanum" ~ "Y",
+                            Species=="Peltophorum_dubium" ~ "Y" ,
+                            Species=="Mimosa_grahamii" ~ "N" ,
+                            Species=="Calliandra_humilis" ~ "N"
+                            )) 
+
+# Ploidy 
+plant_dnds2_meta<- plant_dnds2_meta %>% 
+  mutate(Ploidy=case_when(Species=="Mimosa_aculeaticarpa" ~ "P", 
+                            Species=="Dalea_mollis" ~ "D", 
+                            Species== "Senna_occidentalis" ~ "P",
+                            Species=="Senna_didymobotrya" ~ "P",
+                            Species=="Senna_italica" ~ "P",
+                            Species=="Senna_barclayana" ~ NA,
+                            Species=="Calliandra_eriophylla" ~ "D" ,
+                            Species=="Dalea_mollissima" ~ "D",
+                            Species=="Peltophorum_africanum" ~ "P",
+                            Species=="Peltophorum_dubium" ~ "P" ,
+                            Species=="Mimosa_grahamii" ~ NA ,
+                            Species=="Calliandra_humilis" ~ NA
+                            )) 
+
+```
+
+
+## Species pairs analysis 
+
+dN= nonsynonymous changes, these changes will change the overall protein 
+dS= synonymous changes, won't change the protein and considered the neutral rate 
+dN/dS = how many site changes that matter to site changes that don't matter
+
+dN/dS = 1 the sequence is evolving neutrally because the dS is representative of neutral evolution
+dN/dS > 1 positive selection 
+0 <dN/dS <1 negative selection, purifying selection  
+
+## Now go through all the pairs 
+
+Paired Wilcoxon tests on the free-ratios models in PAML. 
+
+```{r}
+# Make function for faster analysis 
+will_function<- function(pair){
+  
+  # Subset each pair 
+plantb<- plant_dnds2%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+plantb_new<- plantb%>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+plantb_new2<-plantb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+pairb_test<-wilcox.test(plantb_new2$M, plantb_new2$F, paired=TRUE)
+return(pairb_test)
+
+} 
+
+gene_count<- function(pair){
+    # Subset each pair 
+plantb<- plant_dnds2%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+return(genesb)
+}
+
+# Run through all pairs 
+# This comparison will be F-M 
+will_function("a") # not sig
+a_list<-gene_count("a") # 1077 genes
+a_list2<-a_list$Gene
+
+will_function("b") # not sig 
+b_list<-gene_count("b") # 761 
+b_list2<-b_list$Gene
+
+will_function("c") # this one is significant!!! 
+c_list<-gene_count("c") # 1191 
+c_list2<-c_list$Gene
+
+will_function("d") # not sig 
+d_list<-gene_count("d") # 1339 
+d_list2<-d_list$Gene
+
+will_function("e") # not sig
+e_list<-gene_count("e") # 1003
+e_list2<-e_list$Gene
+
+will_function("f") # not sig 
+f_list<-gene_count("f") # 964 
+f_list2<-f_list$Gene
+
+# Which one is significant? Calliandra pair 
+plant_sig<- plant_dnds2%>%
+  filter(Pair=="c")
+plant_sig
+
+# Dataset for plot 
+plant_dnds4<-plant_dnds2%>%
+  mutate(Pass=case_when(Pair=="a" & Gene %in% a_list2~"Y",
+                        Pair=="b" & Gene %in% b_list2~"Y",
+                        Pair=="c" & Gene %in% c_list2~"Y",
+                        Pair=="d" & Gene %in% d_list2~"Y",
+                        Pair=="e" & Gene %in% e_list2~"Y",
+                        Pair=="f" & Gene %in% f_list2~"Y"))
+
+plant_dnds5<-plant_dnds4%>%
+  filter(Pass=="Y")
+
+```
+
+## Plot species pairs 
+
+Species pairs analysis on free-ratio test values. Asterisk represents significance at Wilcoxon tests. 
+
+```{r}
+# Set the colour palette 
+lifestyle<- park_palette("Saguaro")
+
+# Change the _ to spaces for better reading in the the plot 
+plant_dnds3<-plant_dnds5 %>%
+  mutate_if(is.character, 
+                str_replace_all, pattern = "_", replacement = " ")
+
+# Make labels for the plot 
+facet_labeller_pair <- function(variable, value) {
+  c(
+    "", 
+    "",
+    "*",
+    "",
+    "", 
+    ""
+  )
+}
+
+
+facet_labbler_test <- function(variable, value) {
+  c(
+    ""
+  )
+}
+
+# Make level order for species for plotting 
+level_order<-c("Peltophorum africanum", "Peltophorum dubium", "Senna barclayana", "Senna occidentalis", "Senna italica","Senna didymobotrya", "Mimosa aculeaticarpa", "Mimosa grahamii", "Dalea mollissima", "Dalea mollis", "Calliandra eriophylla", "Calliandra humilis")
+
+# Make coordinates for plot 
+label.df <- data.frame(Group = c("Calliandra eriophylla", "Calliandra humilis"),
+                       Value = c(3.7, 3.7))
+
+# Prepare dataset for plotting 
+plant_plot_new<- plant_dnds3 %>%
+  mutate(dummy="test") %>%
+  mutate_at("Transition", str_replace, "gain", "mutualism gain") %>%
+  mutate_at("Transition", str_replace, "loss", "mutualism loss")
+
+ann_text1 <- tribble(
+  ~Species, ~dnds,
+  #--|--|--|----
+  "Calliandra_humilis", 0.8
+)
+
+# Plot
+bp_free_test<-ggplot(plant_plot_new, aes(x=factor(Species, level = level_order), y=dnds, fill=Mutualist))+ 
+  geom_boxplot(outlier.shape=NA) + # To remove the outliers 
+  (ylab("dN/dS ratio"))+
+  (xlab(""))+
+  scale_fill_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  coord_flip(ylim=c(0, 1.3)) +
+  facet_nested(Pair ~ dummy, scales = "free", space="free", labeller= labeller( Pair=as_labeller(facet_labeller_pair), dummy=as_labeller(facet_labbler_test))) +
+  theme_classic() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=8, face="italic"), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.text=element_text(size=9),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="top",
+        #strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        strip.background = element_blank()
+        )
+bp_free_test # This is the good plot for teh legume species pairs tests!
+
+```
+
+
+## Genes under positive selection 
+
+Here we are using the free-ration PAML values and looking at which ones are under positive selection. 
+
+```{r}
+pos_genes_full<-plant_dnds2 %>%
+  dplyr::select(Mutualist, Pair,Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(M > 1 | F >1 ) %>%
+  filter(M<7 & F<7) %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  arrange(Diff) 
+
+# A lot of genes under positive selection here 
+pos_genes_full %>%
+  distinct(Gene) # 797
+
+# Plot the positive genes shared among species 
+plant_dnds2_pos <- plant_dnds2 %>%
+  mutate(Pos=ifelse(dnds>1, 1, 0)) %>%
+  dplyr::select(Species, Gene, Pos) %>%
+  pivot_wider(names_from=Species, values_from=Pos) 
+
+plant_dnds2_pos2 <- plant_dnds2_pos[complete.cases(plant_dnds2_pos), ] # Remove NA
+plant_dnds2_pos3 <-plant_dnds2_pos2[rowSums(plant_dnds2_pos2[-(1)]) !=0, ] # Remove 0s
+
+plant_dnds2_pos3<-data.frame(plant_dnds2_pos3) # 18 genes under positive selection in at least one species 
+plant_dnds2_pos3 # 78 genes 
+
+# Customize plot  
+upset(plant_dnds2_pos3,
+    sets=c("Senna_occidentalis","Senna_barclayana", "Peltophorum_africanum","Peltophorum_dubium", "Mimosa_grahamii"), keep.order=TRUE, 
+    sets.x.label = "Genes per Species", 
+    mainbar.y.label = "",
+    sets.bar.color = c(mut_col[4],non_col[2],mut_col[4], non_col[2], mut_col[4]), 
+    main.bar.color= c(non_col[2],mut_col[4],mut_col[4], non_col[2], mut_col[4], "black","black","black","black", "black", "black", "black", "black")
+    ) 
+
+```
+
+
+## Symbiosis genes 
+Now do the wilcoxon tests just for the genes that are symbiotic. These genes were identified by mapping the symbiotic Roy genes to our transcriptomes. 
+
+```{r}
+# Load the gene names by species 
+roy_genes<-read_csv("MappedRoyGenes.csv")
+roy_genes2<-roy_genes$Gene_name 
+
+# Filter the original dataset  
+plant_dnds_sym <- plant_dnds2 %>% # 3409 rows to start 
+  filter(Code %in% roy_genes2)
+plant_dnds_sym  %>% # 47 only!
+  group_by(Mutualist, Species) %>%
+  summarize()
+# Notes from single copy work: Ok I guess then the symbiotic genes were not good orthologs. This makes me think I do have to go back and find orthologs not in the full 12 species, sigh! 
+# Also go back and map the other non-symbiotic species, maybe there will be more??? 
+
+sym_genes <- plant_dnds_sym %>%
+  distinct(Gene)
+sym_genes # Only 17 genes that map!!!! 
+
+
+```
+## Histograms of all genes vs. symbiosis genes 
+
+Distribution of dn/ds ratios at all genes and identify where the symbiosis genes lie in that distribution. 
+
+```{r}
+# Id the symbiosis values in each pair
+a<-plant_dnds2 %>% 
+  filter(Pair=="a") %>% 
+  filter(Code %in% roy_genes2) 
+as<-a$dnds
+an<-a$Gene
+am<-mean(a$dnds)
+
+b<-plant_dnds2 %>% 
+  filter(Pair=="b") %>% 
+  filter(Code %in% roy_genes2) 
+bs<-b$dnds
+bn<-b$Gene
+bm<-mean(b$dnds)
+
+c<-plant_dnds2 %>% 
+  filter(Pair=="c") %>% 
+  filter(Code %in% roy_genes2) 
+cs<-c$dnds
+cn<-c$Gene
+cm<-mean(c$dnds)
+
+d<-plant_dnds2 %>% 
+  filter(Pair=="d") %>% 
+  filter(Gene %in% sym_genes$Gene) 
+ds<-d$dnds
+dn<-d$Gene
+dm<-mean(d$dnds)
+
+e<-plant_dnds2 %>% 
+  filter(Pair=="e") %>% 
+  filter(Code %in% roy_genes2) 
+es<-e$dnds
+en<-e$Gene
+em<-mean(e$dnds)
+
+f<-plant_dnds2 %>% 
+  filter(Pair=="f") %>% 
+  filter(Code %in% roy_genes2) 
+fs<-f$dnds
+fn<-f$Gene
+fm<-mean(f$dnds)
+
+# Labels for plot 
+
+pairlabs<-c("Mimosa", "Dalea", "Calliandra", "Senna1", "Senna2", "Peltophorum")
+names(pairlabs)<-c("a", "b", "c", "d", "e", "f")
+
+# Mean of the symbiosis genes plotted on top of the histrogam 
+# This is the one to go with 
+plant_dnds2 %>% 
+  ggplot(., aes(x=dnds)) +
+  facet_wrap(~Pair, scales="fixed", 
+             labeller=labeller(Pair=pairlabs)) +
+  geom_histogram() + 
+  xlab("dN/dS ratio") + 
+  #geom_vline(data=filter(plant_dnds2, Pair=="a"), xintercept=c(as), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="a"), aes(xintercept=c(am)), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="b"), aes(xintercept=c(bm)), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="c"), aes(xintercept=c(cm)), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="d"), aes(xintercept=c(dm)), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="e"), aes(xintercept=c(em)), colour="red", linetype="dashed") +
+  geom_vline(data=subset(plant_dnds2, Pair=="f"), aes(xintercept=c(fm)), colour="red", linetype="dashed") +
+  theme_classic() 
+
+
+plant_dnds2 %>% 
+  ggplot(., aes(x=dnds)) +
+  facet_wrap(~Pair, scales="fixed", 
+             labeller=labeller(Pair=pairlabs)) +
+  geom_histogram() + 
+  xlab("dN/dS ratio") + 
+  geom_vline(data=subset(plant_dnds2, Pair=="a"), xintercept=c(as), colour="red", cex=0.1) +
+  theme_classic() 
+
+
+# Try a different way 
+# First prep the data 
+plant_dnds_sym2<-plant_dnds2 %>%
+  mutate(SymbioticGene=case_when(Pair=="a" & Gene %in% an ~ "S", 
+                                 Pair=="b" & Gene %in% bn ~ "S",
+                                 Pair=="c" & Gene %in% cn ~ "S",
+                                 Pair=="d" & Gene %in% en ~ "S",
+                                 Pair=="e" & Gene %in% en ~ "S",
+                                 Pair=="f" & Gene %in% fn ~ "S"
+                                 )) %>%
+  mutate(SymbioticGene=replace_na(SymbioticGene, "N")) 
+
+# Try to highlight the symbiotic gene values 
+plant_dnds_sym2 %>% 
+  ggplot(., aes(x=dnds, fill=SymbioticGene)) +
+  facet_wrap(~Pair, scales="fixed", 
+             labeller=labeller(Pair=pairlabs)) +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "red"))+
+  geom_histogram() + 
+  xlab("dN/dS ratio") + 
+  theme_classic() 
+
+
+```
+
+## Compare mean symbiosis to rest of the genome 
+
+Boxplots to show difference in overall symbiosis and other gene dnds ratios 
+
+```{r}
+# Code the gene as symbiotic or not in the dataframe 
+# But it has to be different for each species 
+
+plant_dnds_sym2<-plant_dnds2 %>%
+  mutate(SymbioticGene=case_when(Pair=="a" & Gene %in% an ~ "S", 
+                                 Pair=="b" & Gene %in% bn ~ "S",
+                                 Pair=="c" & Gene %in% cn ~ "S",
+                                 Pair=="d" & Gene %in% en ~ "S",
+                                 Pair=="e" & Gene %in% en ~ "S",
+                                 Pair=="f" & Gene %in% fn ~ "S"
+                                 )) %>%
+  mutate(SymbioticGene=replace_na(SymbioticGene, "N"))
+
+# Draw the boxplot 
+plant_dnds_sym2 %>% 
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  facet_wrap(~Pair, scale="free_x",
+             labeller=labeller(Pair=pairlabs)) +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  geom_boxplot(outlier.shape=NA) + 
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  ylim(0, 1) +
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+library(ggbreak)
+library(ggh4x)
+
+# Make separate for each species and then combine at the end! 
+# violin plots 
+plant_dnds_sym2
+va<-plant_dnds_sym2 %>% 
+  filter(Pair=="a") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+    labs(tag="a)") +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+
+vb<-plant_dnds_sym2 %>% 
+  filter(Pair=="b") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+    labs(tag="b)") +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+
+vc<-plant_dnds_sym2 %>% 
+  filter(Pair=="c") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+    labs(tag="c)") +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+
+vd<-plant_dnds_sym2 %>% 
+  filter(Pair=="d") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+    labs(tag="d)") +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+
+ve<-plant_dnds_sym2 %>% 
+  filter(Pair=="e") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5)) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+    labs(tag="e)") +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+
+vf<-plant_dnds_sym2 %>% 
+  filter(Pair=="f") %>%
+  ggplot(., aes(x=Mutualist, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+  labs(tag="f)") +
+  theme_classic() + 
+  labs("f")+
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+vf
+
+test<-ggarrange(print(va), print(vb),print(vc),print(vd),print(ve),print(vf),
+          ncol=3, nrow=2)
+test
+
+
+sppv<-plant_dnds_sym2 %>% 
+  filter(Mutualist=="M") %>%
+  ggplot(., aes(x=Species, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  #scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("") +
+  #ylim(0, 1) +
+  theme_classic() + 
+  theme(legend.title=element_blank(),
+        legend.position="bottom",
+        axis.ticks.y.right = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.y.right = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+sppv
+
+
+```
+
+get the labels 
+
+```{r}
+vf<-plant_dnds_sym2 %>% 
+  filter(Pair=="f") %>%
+  ggplot(., aes(x=Species, y=dnds, fill=SymbioticGene)) +
+  scale_y_continuous(
+    limits = c(0, 10),  # Set the limits of the y-axis
+    breaks = seq(0, 10, by=0.5)  # Specify breaks for y-axis
+  ) +
+  ggbreak::scale_y_break(c(1.5, 9.5), space = 0.1) +
+  #facet_wrap(~Pair,  scales = "fixed",
+  #           labeller=labeller(Pair=pairlabs), 
+  #           strip.position = "top") +
+  scale_fill_manual(labels=c("genome-wide", "symbiosis genes"), values=c("grey", "white"))+
+  #scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist")) +
+  #geom_boxplot(outlier.shape=NA) + 
+  geom_violin(draw_quantiles = c(0.5))+
+  ylab("dN/dS ratio") +
+  xlab("Genes") +
+  #ylim(0, 1) +
+  labs(tag="f)") +
+  theme_classic() + 
+  labs("f")+
+  theme(legend.title=element_blank(),
+        legend.position="none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y.right = element_blank(),
+        axis.text.y.right = element_blank())
+vf
+
+```
+
+## Do the unpaired wilcoxon tests 
+
+```{r}
+plant_dnds_sym2 %>% 
+  filter(Species=="Dalea_mollis") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Dalea_mollissima") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Calliandra_eriophylla") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Calliandra_humilis") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Mimosa_aculeaticarpa") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Mimosa_grahamii") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Peltophorum_africanum") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Peltophorum_dubium") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Senna_barclayana") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Senna_italica") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Senna_occidentalis") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+plant_dnds_sym2 %>% 
+  filter(Species=="Senna_didymobotrya") %>%
+  wilcox.test(dnds~SymbioticGene, data=.)
+
+```
+
+
+## Symbiosis genes comparing the numbers 
+
+Count how many genes are shared in different numbers of species 
+Does the number of species sharing the gene impact the dn/ds ratio? 
+How to plot this? 
+
+```{r}
+# Get the symbiotic genes 
+symgenes3<-plant_dnds2 %>% 
+  filter(Gene %in% sym_genes$Gene) 
+  #filter(Code %in% roy_genes2)
+# This is taking anything that matches the gene code 
+  
+plant_dnds_sym2 %>%
+  group_by(Mutualist, Species)%>%
+  summarize()
+
+symgenes3 %>%
+  group_by(Mutualist, Species)%>%
+  summarize()
+# This has the whole legume dataset now 
+
+# Count how many species each gene is in (shared by)
+symcount<-plant_dnds_sym2 %>%
+  count(Gene)
+symcount
+
+symmeanM<-plant_dnds_sym2 %>%
+  group_by(Gene) %>%
+  filter(Mutualist=="M") %>%
+  summarize(mean(dnds)) 
+colnames(symmeanM)[2]="Mmean"
+
+symmeanF<-plant_dnds_sym2 %>%
+  group_by(Gene) %>%
+  filter(Mutualist=="F") %>%
+  summarize(mean(dnds))
+colnames(symmeanF)[2]="Fmean"
+
+
+# Clean up the dataset 
+symdata1 <- symmeanM %>%
+  full_join(symmeanF)
+
+
+symdata3 <- symdata1 %>%
+  full_join(symcount) %>%
+  pivot_longer(cols=-c(Gene, n), names_to="Mean", values_to="dnds") %>%
+  mutate(n=as.factor(n)) 
+
+
+# Try a plot 
+ggplot(symdata3, aes(x=n, y=dnds, fill=Mean)) +
+  geom_bar(stat="identity", position="dodge") + 
+  scale_fill_manual(labels=c("non-mutualists", "mutualists"), values=c("black", "grey"))+
+  #scale_x_discrete(labels=c("Fmean" = "non-mutualists", "S" = "symbiosis")) +
+  xlab("Number of species that share the gene") +
+  ylab("dN/dS ratio") + 
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+ggplot(symdata3, aes(x=n, y=dnds, color=Mean)) +
+  geom_boxplot(outlier.shape = NA)+ 
+  #geom_bar(stat="identity", position="dodge") + 
+  #scale_fill_manual(labels=c("non-mutualists", "mutualists"), values=c("grey", "white"))+
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  #scale_x_discrete(labels=c("Fmean" = "non-mutualists", "S" = "symbiosis")) +
+  xlab("Number of species that share the gene") +
+  ylab("dN/dS ratio") + 
+  #ylim(c(0,0.45)) +
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+ggplot(symdata3, aes(x=n, y=dnds, color=Mean)) +
+  geom_boxplot(outlier.shape = NA)+ 
+  #geom_bar(stat="identity", position="dodge") + 
+  #scale_fill_manual(labels=c("non-mutualists", "mutualists"), values=c("grey", "white"))+
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  #scale_x_discrete(labels=c("Fmean" = "non-mutualists", "S" = "symbiosis")) +
+  xlab("Number of species that share the gene") +
+  ylab("dN/dS ratio") + 
+  #ylim(c(0,0.45)) +
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+
+testbinaryplant<-symdata3 %>%
+  mutate(Binary = ifelse(n == 12, "conserved", "unique"))
+
+  ggplot(testbinaryplant, aes(x=Binary, y=dnds, fill=Mean)) + 
+  geom_boxplot(outlier.shape = NA) + 
+  scale_fill_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  scale_x_discrete(labels=c("conserved symbiosis genes", "other symbiosis genes")) +
+  xlab("") +
+  ylab("dN/dS ratio") + 
+  ylim(c(0,1.2))+
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+
+# test the model with anova 
+modelplant<-lm(dnds~Binary*Mean, data=testbinaryplant)
+plot(modelplant)
+summary(modelplant)
+Anova(modelplant, type=3) # significant but the data is not normal 
+
+wilcox.test(dnds ~ Binary, data = testbinaryplant, exact = FALSE) # not significant 
+```
+
+
+
+## Symbiotitic analysis 
+
+```{r}
+# Filter data for sym genes 
+plant_sym <- plant_dnds2 %>%
+  filter(Gene %in% sym_genes$Gene)
+plant_sym # 137 rows 
+
+# Use this as input into the functions 
+sym_function<- function(pair){
+  
+  # Subset each pair 
+plantb<- plant_sym%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+plantb_new<- plantb%>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+plantb_new2<-plantb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+pairb_test<-wilcox.test(plantb_new2$F, plantb_new2$M, paired=TRUE)
+return(pairb_test)
+
+} 
+
+sym_count<- function(pair){
+    # Subset each pair 
+plantb<- plant_sym%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+return(genesb)
+}
+
+# Test each pair 
+# Def count how many genes are in each analysis 
+# Might be better to just show reaction norms for teh genes we have if small 
+
+sym_function("a") # not sig
+sym_count("a") # 11 genes 
+
+sym_function("b")
+sym_count("b") # 9 genes 
+
+sym_function("c")
+sym_count("c") # 10 
+
+sym_function("d")
+sym_count("d") # 10 
+
+sym_function("e")
+sym_count("e") # 8
+
+sym_function("f")
+sym_count("f") # 11 
+
+# Try a total across all species comparison here 
+plant_sym2<-plant_sym %>%
+  mutate(MutualistLabel=case_when(Mutualist=="M" ~ "mutualist",
+                                  Mutualist=="F" ~ "non-symbiotic")) %>%
+  mutate(PairLabel=case_when(Pair=="c" ~ "Calliandra",
+                             Pair=="b" ~ "Dalea",
+                             Pair=="a" ~ "Mimosa",
+                             Pair=="f" ~ "Peltophorum",
+                             Pair=="d" ~ "Senna1",
+                             Pair=="e" ~ "Senna2")) %>%
+  mutate_at("Transition", str_replace, "gain", "mutualism gain") %>%
+  mutate_at("Transition", str_replace, "loss", "mutualism loss")
+
+# Check which genes have a match 
+plant_sym%>%
+  filter(Pair=="f") %>%
+  group_by(Gene) %>%
+  tally()
+
+# Remove the genes with no match 
+plant_sym3<-plant_sym2 %>%
+  subset(!(Pair=="a" & Gene=="OG0021088")) %>%
+  subset(!(Pair=="b" & Gene=="OG0020658")) %>%
+  subset(!(Pair=="b" & Gene=="OG0031042")) %>%
+  subset(!(Pair=="b" & Gene=="OG0032198")) %>%
+  subset(!(Pair=="b" & Gene=="OG0037224")) %>%
+  subset(!(Pair=="c" & Gene=="OG0035706")) %>%
+  subset(!(Pair=="d" & Gene=="OG0032198")) %>%
+  subset(!(Pair=="d" & Gene=="OG0037224")) %>%
+  subset(!(Pair=="e" & Gene=="OG0020658")) %>%
+  subset(!(Pair=="e" & Gene=="OG0028014")) %>%
+  subset(!(Pair=="e" & Gene=="OG0032198")) %>%
+  subset(!(Pair=="f" & Gene=="OG0020658")) %>%
+  subset(!(Pair=="f" & Gene=="OG0035706"))
+plant_sym3
+
+# Try the lollipop plot 
+# Prep the dataset 
+plant_sym4 <- plant_sym3 %>%
+  group_by(Pair) %>%
+  dplyr::select(Mutualist, Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(!is.na(M) & !is.na(F))
+
+sym_plot_pl <- plant_sym4 %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  filter(Diff!=0) %>%
+  arrange(Diff) 
+
+sym_plot_pl2 <- sym_plot_pl %>%
+  mutate(Pair2=case_when(Pair=="a" ~ "Mimosa", 
+                            Pair=="b" ~ "Dalea", 
+                            Pair=="c" ~ "Calliandra",
+                            Pair=="d" ~ "Senna1",
+                            Pair=="e" ~ "Senna2",
+                            Pair=="f" ~ "Peltophorum"))
+
+
+# Plot the lollipop plot 
+popplot_pl<- ggplot(sym_plot_pl2) + 
+  geom_segment(aes(x=fct_reorder(Gene, minus), y=M, xend=Gene, yend=F), color="grey") + 
+  geom_point(aes(x=Gene, y=M, color="M"), size=3.2) + 
+  geom_point(aes(x=Gene, y=F, color="F"), size=3.2) + 
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  coord_flip() + 
+  facet_grid(rows = vars(Pair2), space="free", scales="free") +
+  (xlab("Symbiotic genes"))+
+  (ylab("dN/dS ratio"))+
+  theme_light() + 
+  theme(axis.title = element_text(size=12), 
+        axis.text.y= element_text(size=9), 
+        axis.text.x= element_text(size=11),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.text=element_text(size=9),
+        #panel.grid = element_blank(),
+        panel.border = element_blank()
+  )
+popplot_pl
+
+
+sym_plot_pl2
+popplot_power<- sym_plot_pl2 %>%
+  filter(Pair2=="Calliandra") %>%
+  ggplot() + 
+  geom_segment(aes(x=fct_reorder(Gene, minus), y=M, xend=Gene, yend=F), color="grey") + 
+  geom_point(aes(x=Gene, y=M, color="M"), size=7) + 
+  geom_point(aes(x=Gene, y=F, color="F"), size=7) + 
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  coord_flip() + 
+  facet_grid(rows = vars(Pair2)) +
+  (xlab("Symbiotic genes"))+
+  (ylab("dN/dS ratio"))+
+  theme_light() + 
+  theme(axis.title = element_text(size=23), 
+        axis.text.y= element_text(size=20), 
+        axis.text.x= element_text(size=20),
+        legend.title = element_blank(),
+        panel.background = element_rect(fill='transparent'),
+        legend.position = "top",
+        plot.background = element_rect(fill='transparent', color=NA),
+        legend.text=element_text(size=20),
+        #panel.grid = element_blank(),
+        panel.border = element_blank(), 
+        aspect.ratio=1.2
+  )
+popplot_power
+
+```
+
+## Two ratio model analysis in subset of pairs 
+Instead of a free-ratio model, here we are analyzing mutualists and non-mutualists as two categories. These analyses are only performed on the species pairs that represent a loss of mutualism. These species also share other similar life history traits. 
+
+```{r}
+# These include both losses and gains 
+# Only going to include the loss species because they have lots of similarities in other life history traits 
+plant_2ratio<-read_csv("TwoRateCombo_clean.csv") # dataset 
+
+# Change the dnds ratio to a numeric value 
+plant_2ratio <- plant_2ratio %>%
+  mutate(dnds=as.numeric(dnds))
+
+plant_2ratio %>%
+  group_by(Gene) %>%
+  tally()
+# 300 genes total 
+
+# Remove abnormally high dnds values 
+high_gene<-plant_2ratio %>%
+  filter(dnds>=10) %>%
+  dplyr::select(Gene) %>%
+  distinct(Gene)
+# high_gene # 15 genes that are too high
+
+plant_2ratio2<-plant_2ratio %>%
+  filter(!Gene %in% high_gene$Gene)
+plant_2ratio2 %>%
+  filter(dnds>=10) # double check 
+
+# Check the number of genes 
+plant_2ratio2 %>%
+  group_by(Gene) %>%
+  tally() # 277 genes 
+
+# Run the wilcoxon tests 
+will_function2<- function(pair){
+  
+  # Subset each pair 
+plantb<- plant_2ratio2 %>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb %>%
+  filter(!is.na(dnds)) %>%
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+plantb_new<- plantb %>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+plantb_new2<-plantb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+pairb_test<-wilcox.test(plantb_new2$F, plantb_new2$M, paired=TRUE)
+return(pairb_test)
+
+} 
+
+gene_count2<- function(pair){
+    # Subset each pair 
+plantb<- plant_2ratio2 %>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb %>%
+  filter(!is.na(dnds)) %>%
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==2)
+return(genesb)
+}
+
+will_function_dir<- function(pair){
+  
+  # Subset each pair 
+plantb<- plant_2ratio2 %>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb %>%
+  filter(!is.na(dnds)) %>%
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+plantb_new<- plantb %>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+plantb_new2<-plantb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+# Greater and sig means free is greater than M 
+pairb_test<-wilcox.test(plantb_new2$M, plantb_new2$F, paired=TRUE, alternative="less")
+return(pairb_test)
+
+}
+
+# All pairs will be the same so can just run one 
+will_function2("a") # sig! loss
+will_function_dir("a") # For free greater not sig, and for free less than mut sig! 
+gene_count2("a") # 273 genes 
+
+```
+
+## Plot the two-ratio values 
+
+```{r}
+# Change labels 
+plant_2ratio2<-plant_2ratio2 %>%
+  mutate_if(is.character, 
+                str_replace_all, pattern = "_", replacement = " ")
+
+# Boxplot plot  
+plant_2ratio2_simple <- plant_2ratio2%>%
+  filter(Pair=="f" | Pair=="a") %>%
+  mutate_at("Transition", str_replace, "gain", "mutualism gain") %>%
+  mutate_at("Transition", str_replace, "loss", "mutualism loss")
+plant_2ratio2_simple
+
+# Plot just the loss category with similar habitats 
+two_box<-plant_2ratio2_simple %>%
+  filter(Estimate=="loss") %>%
+  ggplot(aes(x=Mutualist, y=dnds, fill=Mutualist))+ 
+  geom_boxplot(outlier.shape=NA) + # To remove the outliers
+  scale_y_continuous(limits = c(0, 0.57)) +
+  ggsignif::geom_signif(annotations ="*", y_position = c(0.5), xmin = c(1), xmax =c(2), tip_length = 0) +
+  (ylab("dN/dS ratio"))+
+  (xlab(""))+
+  scale_fill_manual(labels=c("non-symbiotic", "mutualist"), values=c(non_col[2],mut_col[4]))+
+  scale_x_discrete(labels=c("F" = "non-symbiotic", "M" = "mutualist"))+
+  theme_light() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.position= "none",
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        legend.text=element_text(size=10),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        aspect.ratio = 1.3
+        )
+two_box
+```
+
+## Genes under positive selection in two-rate models 
+
+```{r}
+pos_genes<-plant_2ratio2_simple %>%
+  dplyr::select(Mutualist, Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(M > 1 | F >1 ) %>%
+  filter(M<10 & F<10) %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  arrange(Diff) 
+
+pos_genes1<- pos_genes%>%
+  filter(Transition=="mutualism loss")
+
+# Plot the lollipop plot 
+pos2plot<- ggplot(pos_genes1) + 
+  geom_segment(aes(x=fct_reorder(Gene, M), y=M, xend=Gene, yend=F), color="grey") + 
+  geom_point(aes(x=Gene, y=M, color="M"), size=3.2) + 
+  geom_point(aes(x=Gene, y=F, color="F"), size=3.2) + 
+  geom_hline(yintercept=1, linetype="dashed") + 
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2], mut_col[4]))+
+  coord_flip() + 
+  (xlab("Significant genes"))+
+  (ylab("dN/dS ratio"))+
+  labs(tag = "(b)") +
+  theme_light() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.text=element_text(size=9),
+        panel.border = element_blank()
+  )
+pos2plot
+
+```
+
+## Symbiotic genes in two rate models 
+
+Take the two rate model and get the sym genes 
+
+```{r}
+# Filter data for sym genes 
+sym2w <- plant_2ratio2_simple %>%
+  filter(Gene %in% sym_genes$Gene)
+# sym2w # 18 rows 
+
+sym2w_pop <- sym2w %>%
+  dplyr::select(Mutualist, Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) 
+
+# Prep the dataset 
+sym_plot <- sym2w_pop %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  arrange(Diff) 
+
+# Labels 
+names2<- c(
+  "gain" = "mutualism gain",
+  "loss" = "mutualism loss"
+)
+
+# Plot the lollipop plot 
+symloss<- sym_plot %>% 
+  filter(Transition=="mutualism loss")
+
+symloss_plot<-  ggplot(symloss) + 
+  geom_segment(aes(x=fct_reorder(Gene, minus), y=M, xend=Gene, yend=F), color="grey") + 
+  geom_point(aes(x=Gene, y=M, color="M"), size=3.2) + 
+  geom_point(aes(x=Gene, y=F, color="F"), size=3.2) + 
+  scale_color_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2],mut_col[4]))+
+  coord_flip() + 
+  (xlab("Symbiotic genes"))+
+  labs(tag = "(c)") +
+  (ylab("dN/dS ratio"))+
+  theme_light() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text=element_text(size=9),
+        #panel.grid = element_blank(),
+        panel.border = element_blank()
+  )
+
+# Merge with the other two rate result 
+two_box<-plant_2ratio2_simple %>%
+  filter(Estimate=="loss") %>%
+  ggplot(aes(x=Mutualist, y=dnds, fill=Mutualist))+ 
+  geom_boxplot(outlier.shape=NA) + # To remove the outliers
+  scale_y_continuous(limits = c(0, 0.57)) +
+  ggsignif::geom_signif(annotations ="*", y_position = c(0.5), xmin = c(1), xmax =c(2), tip_length = 0) +
+  (ylab("dN/dS ratio"))+
+  (xlab(""))+
+  scale_fill_manual(labels=c("non-mutualist", "mutualist"), values=c(non_col[2],mut_col[4]))+
+  scale_x_discrete(labels=c("F" = "non-mutualist", "M" = "mutualist"))+
+  theme_light() + 
+  labs(tag = "(a)") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=8.7), 
+        legend.title = element_blank(), 
+        legend.position= "none",
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        legend.text=element_text(size=10),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5)
+        )
+
+# Merge the plots 
+tworate_plot<- ggarrange(two_box, symloss_plot,
+                    labels=c("(a)", "(b)"), 
+                    ncol = 2, nrow=1,
+                    hjust=0.1,
+                    common.legend=FALSE 
+                    )
+
+library(gridExtra)
+
+grid.arrange(two_box, pos2plot, symloss_plot,
+             ncol=3, nrow=2, 
+             layout_matrix=rbind(c(1,2,2),
+                                 c(1,3,3)))
+
+```
+
+## Plot the tree with the traits for visualization 
+Here plot the main Zanne tree with the traits on it 
+Only label the species in our dataset 
+Two species won't have their pair because it was from a different phylogeny that was on a smaller but more detailed tree 
+
+```{r}
+# Load the tree 
+lpwg_tree<-read.newick("LPWG_2018_newick_spp.txt")
+# 3842 tips 
+
+# Load the data 
+lpwg_data<-read_csv("LPWG_2018_data.csv")
+# lpwg_data #3842 data rows 
+lpwg_data2<- lpwg_data %>%
+  mutate(Fixer=as.factor(Fixer)) %>%
+  filter(!is.na(Fixer)) %>%
+  filter(!is.na(lat_native))
+
+# Prune tree for tips with data 
+spp_prune<-lpwg_data2$Species
+pruned_tree<-drop.tip(lpwg_tree,lpwg_tree$tip.label[-match(spp_prune, lpwg_tree$tip.label)])
+# pruned_tree # 1104 tips 
+
+# Save the tree 
+plant_tree<- ggtree(pruned_tree, layout="fan", open.angle=10)
+
+```
+
+### Customize the plot of the tree 
+Add the 
+
+```{r}
+# Prep the data 
+lpwg_data3<-lpwg_data2 %>%
+  mutate(mutualist=case_when(Fixer=="Yes" ~ "mutualist",
+                             Fixer=="No" ~ "non-mutualist")) %>% 
+  dplyr::select(Species, mutualist)
+
+lpwg_data2 %>% # 1154 total 
+  filter(Fixer=="Yes") #987 
+
+lpwg_data2 %>% # 1154 total 
+  filter(Fixer=="No") #167 
+
+# Tree and collapse 
+p <- ggtree(pruned_tree, layout="circular", branch.length = "none", open.angle=10, size=0.1) %<+% lpwg_data3
+p3<- scaleClade(p, 1459, 0.02) %>% collapse(1459, 'min', fill=mut_col[4]) 
+
+# Prep data 
+data1<-plant_dnds %>%
+  dplyr::select(Species, Mutualist) %>%
+  distinct()
+
+lpwg_data4<-lpwg_data3 %>%
+  mutate(Size=ifelse(Species %in% data1$Species, 0.8, 0.1)) %>%
+  mutate(Mutualist=ifelse(mutualist=="mutualist", "M", "F")) %>%
+  filter(!is.na(Mutualist)) %>%
+  dplyr::select(Species, Mutualist, Size) %>%
+  mutate(Shape=ifelse(Species %in% data1$Species, "Y", "N"))
+
+lpwg_data5<-lpwg_data3 %>%
+  mutate(Size=ifelse(Species %in% data1$Species, 3, 0.1)) %>%
+  mutate(Mutualist=ifelse(mutualist=="mutualist", "M", "F")) %>%
+  filter(!is.na(Mutualist)) %>%
+  dplyr::select(Species, Mutualist, Size) %>%
+  mutate(Shape=ifelse(Species %in% data1$Species, "Y", "N"))
+
+# Prep the data 
+p4 <- ggtree(pruned_tree, aes(color=mutualist, size=2), layout="circular", branch.length = "none", open.angle=10, size=0.1) %<+% lpwg_data3 
+p4
+
+p5 <- scaleClade(p4, 1459, 0.02) %>% collapse(1459, 'min', fill=mut_col[4]) 
+
+# Plot the tree 
+plant_tree <- p5 %<+% lpwg_data5 + 
+  geom_tree(size=0.8) + # Change thickness of the lines 
+  geom_tiplab(aes(color=mutualist, align=TRUE,geom = "text", subset=c(label %in% c('Dalea_mollis', 'Dalea_mollissima', 'Senna_didymobotrya', 'Senna_italica', 'Peltophorum_africanum', 'Peltophorum_dubium', 'Senna_occidentalis', 'Senna_barclayana', 'Mimosa_aculeaticarpa', 'Calliandra_eriophylla'))), size=2, offset=1.3) + # Change labels and size, alignment 
+  scale_color_manual(values=c(mut_col[4], non_col[2]), na.value="lightgrey", breaks = c("mutualist", "non-mutualist"))+
+  #scale_color_manual(values=c(mut_col[4], non_col[2]))+
+  geom_star(mapping=aes(fill=Mutualist, size=Size, starshape=Shape), position="identity",starstroke=0.3) + # For the species in the dataset 
+  scale_fill_manual(values=c(non_col[2], mut_col[4])) + # Colour for mutualist and non-mutualists
+  scale_starshape_manual(values=c(15, 1)) + 
+  scale_size_continuous(range = c(0, 3.2)) +
+  guides(size = FALSE, fill= FALSE, starshape=FALSE) +
+  guides(color = guide_legend(override.aes = list(size=4))) + 
+  theme(legend.title = element_blank(), 
+        legend.text=element_text(size=12),
+        legend.position="top"
+        )
+plant_tree
+
+```
+
+
+## Invasion tests 
+Test the impact of invasion status on rates of molecular evolution. 
+
+```{r}
+# Colour scheme 
+inv_col<-park_palette("Yosemite")
+inv_col2<-park_palette("Yellowstone")
+
+# Put in the invasion data from PAML two rate model 
+invasion_data<-read_csv("invasionrates_new.csv")
+invasion_data2<- invasion_data %>%
+  filter(dnds<10) %>%
+  filter(Species=="Dalea_mollis" | Species=="Senna_occidentalis") %>%
+  mutate(Invasive=case_when(Species=="Dalea_mollis" ~ "N", 
+                            Species=="Senna_occidentalis" ~ "Y")) %>%
+  mutate(new_pair=case_when(Species=="Dalea_mollis" ~ "test", 
+                            Species=="Senna_occidentalis" ~ "test"))
+
+invasion_data2 %>% 
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==2)
+
+# Plot the new ratios 
+  ggplot(invasion_data2, aes(x=Invasive, y=dnds, fill=Invasive)) + 
+  geom_boxplot(outlier.shape = NA) +
+  scale_fill_manual(values=c(inv_col2[2], inv_col[2])) +
+  scale_y_continuous(limits = c(0, 1)) +
+  ylab("dN/dS ratio") + 
+  ggsignif::geom_signif(annotations ="*", y_position = c(0.65), xmin = c(1), xmax =c(2), tip_length = 0) +
+  scale_x_discrete(labels=c("Y" = "invasive", "N" = "non-invasive"))+
+  xlab("") +
+  theme_light() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.text=element_text(size=9),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        #strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+  
+# Run a linear model to test for differences
+# May have to limit dnds ratios to under 2 in order to fit model assumptions 
+plant_dnds2_meta_lim<-plant_dnds2_meta %>%
+  filter(dnds<2) %>%
+  mutate(Species==as.factor(Species))
+
+# Run the model 
+mod_invasion=lmer((dnds)~Invasive+Mutualist+Human+Ploidy+(1|Pair/Species), data=plant_dnds2_meta_lim)
+plot(mod_invasion) # not a great fit but better than transformed 
+summary(mod_invasion)
+Anova(mod_invasion, type=3, singular.ok = T)
+# What to do about Species? For PGLS will have to calculate an average but that method will lose some detail  
+
+# Paired Wilcoxon test function 
+inv_function<- function(pair){
+  
+  # Subset each pair 
+plantb<- invasion_data2%>%
+  filter(new_pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+plantb_new<- plantb%>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+plantb_new2<-plantb_new %>%
+  select(Gene, Invasive, dnds) %>%
+  pivot_wider(names_from = Invasive, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+pairb_test<-wilcox.test(plantb_new2$N, plantb_new2$Y, paired=TRUE)
+return(pairb_test)
+
+} 
+
+# Function for counting genes in the analysis 
+inv_gene_count<- function(pair){
+    # Subset each pair 
+plantb<- invasion_data2%>%
+  filter(new_pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-plantb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+return(genesb)
+}
+
+# Run the analysis on the data 
+inv_function(pair="test")
+# sig V=30761 p <0.0001 inv-non
+# V=7742 non greater than inv 
+inv_gene_count(pair="test") # 277 genes 
+```
+
+## Linear models 
+Here are the linear mixed models performed on all the genes across all species at Matt Pennell's request. This test will have sooooooo much POWER! 
+
+The raw data does not fit the models well. Unclear if we should transform the dnds values. Other problems are that the model outputs results that are different than our wilcoxon tests. 
+
+```{r}
+# Prep the dataset 
+mixeddata<-plant_dnds2_meta %>%
+  mutate(Mutualist=as.factor(Mutualist)) %>%
+  mutate(Pair=as.factor(Pair)) %>%
+  mutate(Gene=as.factor(Gene)) %>%
+  mutate(Transition=as.factor(Transition)) %>%
+  mutate(Invasive=as.factor(Invasive)) %>%
+  mutate(Ploidy=as.factor(Ploidy))
+
+# Build the model 
+# Need random terms to account for the paired design and go gene by gene 
+# Mutualist is fixed effect and species pair and the gene are random effects 
+model1<-lmer(dnds ~ Mutualist + Ploidy + (1|Pair) + (1|Gene), data=mixeddata)
+
+# Check the model 
+plot(model1)
+qqnorm(resid(model1))
+qqline(resid(model1))
+plot(fitted(model1), sqrt(abs(resid(model1))), main="Scale-location")
+# Quite messy, not sure whether transforming dnds ratios seem like the right thing to do 
+
+# Check significance 
+summary(model1)
+Anova(model1, type=3)
+# When we include ploidy then we see the significant result with mutualists 
+# When we include transition the result is the same with the sig result with mutualists and no interaction with transition and mutualists 
+
+# Grab means from the model 
+model1_results<-data.frame(summary(emmeans(model1, ~Mutualist))) # Save the means from a linear model for plotting, gives the mean and se
+model1_results # CRY!!!! This is the opposite pattern to our other analyses!!!! 
+# But the model is not a good fit for the data 
+# Log transformed data does not really work well 
+
+```
+
+

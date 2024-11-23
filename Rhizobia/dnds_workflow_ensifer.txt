@@ -1,0 +1,824 @@
+## Download the genome assemblies from the Fagorzi 2020 paper 
+## Put all the assembly codes in a text file, got the codes from the supplemental material excel file 
+## In order to run OrthoFinder we need the protein files the .faa 
+
+datasets download genome accession --inputfile sino_eni_genomes.txt --include protein # Put in the faa file 
+
+## Count the files 
+## This downloads the protein files but it names them all as protein.faa!! WHHHHYYYYY!???
+## Rename the protein files and move them 
+
+find . -type d | wc -l # 105 directories 
+find -type f -exec bash -c 'fp=$(dirname "$1");fn=$(basename "$fp");px="${1##*.}";mv "$1" "$fp"/"$fn"."$px"' sh "{}" \; 
+find . -name '*.faa' -exec cp {} /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/SinoEnsiClade/sino_genomes_faa/ \;
+ls | wc -l # 104 files 
+
+## So all in all we have 104 genomes to compare (even though we lost some for the protein files but oh well pretty good) 
+
+## Reduce the number of transcripts on the .faa files 
+
+for f in *faa ; do python /ohta/tia.harrison/src/OrthoFinder/tools/primary_transcript.py $f ; done &
+
+## Make sure each gene has the species identifier in the header 
+
+while read name; do
+	sed 's/>/>'"$name"'_/g' "$name" > Clean/new_"$name"
+done < sino_genomes_list
+
+## Run OrthoFinder on the new transcripts, OrthoFinder can only take amino acid sequences not nucleotides 
+## Transfer the files into Niagara because for 104 genomes the ohta server does not have the room  
+## Name the job sino_ortho_job.sh
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name sino_job
+#SBATCH --output=sino_out_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+orthofinder -f Clean/
+
+## Run the job on niagara and check submission 
+sbatch sino_spp_job.sh
+squeue -u harri318
+
+## Worked! Yahoo! 
+## Put the files and directories back on ohta 
+
+scp -r /scratch/f/freder19/harri318/sino_ortho/Clean_aminos/Clean/OrthoFinder/* tia.harrison@ohta.eeb.utoronto.ca:/ohta/tia.harrison/MolecularProject/Rhizobia_pairs/SinoEnsiClade/sino_genomes_ortho/ 
+
+## We have 552 single copy genes shared among all 104 species in the analysis
+## Can we do the dn/ds analysis on these shared genes and then do pgls to compare the groups since we don't have paired species? There were a couple of special cases though 
+
+## Now download the CDS files 
+
+datasets download genome accession --inputfile sino_eni_genomes.txt --include cds # Put in the cds folder 
+
+## Change the file names to match the protein files later downloaded 
+
+find -type f -exec bash -c 'fp=$(dirname "$1");fn=$(basename "$fp");px="${1##*.}";mv "$1" "$fp"/"$fn"."$px"' sh "{}" \; 
+find . -name '*.fna' -exec cp {} /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/SinoEnsiClade/sin_CDS/fna_files/ \;
+ls | wc -l # 104 files, same as the proteins 
+
+## Go to the .faa file with the 104 protein sequences and make list of the ones we got genomes for - go to the sino_genomes_faa/primary....Clean
+## Move it to the .fna file with the nucleotide sequences go to the sino_genomes_faa/primary....Clean
+## Change it to match the .fna extension and filter out the proper sequences for continuing 
+
+ls *.faa > genome_list # Now take this to new folder with the cds fasta files 
+sed 's/new_//g' genome_list > genome_list_new
+sed -i 's/faa/fna/g' genome_list_new
+cp $(<genome_list_new) filtered_genomes
+ls | wc -l # 104 Aww yeah! Work on these files 
+
+## Make sure each gene has the species identifier in the header 
+
+while read name; do
+	sed 's/>/>'"$name"'_/g' "$name" > Clean_new/new_"$name"
+done < genome_list_new
+
+## Go back to the orthogroups and get the list of orthologs  
+
+grep -Fwf Orthogroups_SingleCopyOrthologues.txt Orthogroups.tsv > OrthologsIDS_sino.txt
+
+## Make big master list of all the sequence files now that they are labelled 
+
+ls new* | wc -l # 104 files 
+cat new* > big_sino_file_test.fna
+grep -c "^>" big_sino_file_test.fna # 690928 sequences 
+grep -c "^>" new_GCA_002532005.1.fna # 5954 sequences this seems like a lot! 
+
+## Clean up the labels 
+
+sed 's/lcl|//g' big_sino_file_test.fna > big_sino_file_test2.fna # Remove lcl|
+sed 's/fna_.*_cds_/faa_/g' big_sino_file_test2.fna > big_sino_file_test3.fna # remove the wrong code inbetween faa and cds
+sed -i 's/\s.*$//' big_sino_file_test3.fna # Remove everything after space
+sed 's/^\([^_]*\(_[^_]*\)\{2\}\).*/\1/g' big_sino_file_test3.fna > big_sino_file_test4.fna # Remove last underscore and everything after it 
+grep -c "^>" big_sino_file_test4.fna
+
+## Split up the big ortholog group file into separate files 
+## Replace tabs with new lines 
+
+cp OrthologsIDS_sino.txt OrthologsIDS_sino_test.txt
+awk 'BEGIN {OFS="\t"} {print>$1}' OrthologsIDS_sino_test.txt
+sed -i 's/\t/\n/g' OG*
+
+## Change to unix file and add new line to the bottom 
+sed -i -e 's/\r\+$//' OG*
+ed -s OG* <<< w
+
+## Combine all the code 
+## Make big file with all the code 
+
+cp big_sino_file_test4.fna big_sino_file_new.fna
+awk '{ print $1, $NF }' OrthologsIDS_sino_test.txt > pull_script
+cut -f1 -d' ' pull_script > pull_script2    # Cut the leftover 
+sed -i 's/^/grep -w -A 2 -f /' pull_script2
+sed -i 's/$/ big_sino_file_new.fna --no-group-separator > /' pull_script2
+
+## Make the file with the ortho names with .fa at the end 
+## Make new list of codes 
+awk '{ print $1, $NF }' OrthologsIDS_sino_test.txt > ortho_names
+cut -f1 -d' ' ortho_names > ortho_names2  
+sed -i 's/$/.fna/' ortho_names2
+
+## Save extra copies 
+cp ortho_names2 ortho_names3
+cp pull_script2 pull_script3
+
+## Put all the code together 
+paste pull_script3 ortho_names3 > extraction_script
+
+## Fix the beginning of the script, sometimes spaces don't get found in sed
+sed 's/--no-group-separator//g' extraction_script > extraction_script2
+sed -i 's/grep[[:space:]]-w[[:space:]]-A[[:space:]]2[[:space:]]-f/seqkit grep -n -f/g' extraction_script2
+
+## Test that a sequence is found in the big file 
+
+awk '/GCA_000320385.2.faa_AGA10186.1/{print "Found."}' big_sino_file_new.fna
+## Found once 
+
+## Run the script 
+nohup bash extraction_script2 & 
+
+## Count the number of > headers in each file, there should be 104 for each gene
+
+grep -c ">" OG0001332.fna # Now 104 - go back and redo the first ones 
+grep -c ">" OG*.fna > Fasta_count.txt # Now all are 104! Yay! 
+
+## Do the prank alignment for all the genes 
+## Put in a script and run in background (544 genes) 
+
+for f in OG*.fna
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+nohup bash prank_align & 
+
+
+## Convert the files 
+## Run the program on all gene alignments, use script called conversion_loop
+
+for f in *.fas 
+do 
+	Fasta2Phylip.pl $f 
+done
+
+## Do the trees on all the genes 
+## Maybe try multithreading with raxmlHPC-PTHREADS-SSE3
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+## The RAxML_bestTree.OG0001609.tree has branch lengths and the analysis will only output one tree 
+## Make list of ortholog names 
+ls *.best.fas.phy > OrthologNamesFile 
+
+## Clean up the names 
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Put code in createcodeml script and run 
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' codeml_lineage3.ctl > "$name".ctl
+done < OrthologNamesFile 
+
+## For loop is in script called PAML_run
+## This will run PAML on all the genes  
+## For some reason this didn't take too long on ohta server hmmm... suspicious?  
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+## Do on the niagara server 
+
+vi sino_paml_job.sh
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name paml_sin
+#SBATCH --output=paml_sin_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+## Submit and sub check 
+sbatch sino_paml_job.sh
+squeue -u harri318 # Submitted on Niagara 
+
+## This did not finish properly I dont think
+## Maybe this is way too much - try to just put one ratio for the mut and one ratio for the ref and see what that gives in the hyphy model instead 
+## If there are pairs we can extract them and maybe do sister spp pair comparisons on those 
+
+## Need to label the sequences based on mutualist or free living and do the hyphy test instead, free ratios might be way to complicated for sooo many samples 
+## Could pick out the pairs later and do the wilcoxon tests on those with free ratios 
+## in clean_phy directory 
+
+## Test one 
+sed -i -e 's/GCA_000697965.2.*.1/GCA_000697965.2{free}/g' OG0001371.best.fas.phy
+
+for file in *.phy
+do 
+sed -i -e 's/GCA_000697965.2.faa.*.1/GCA_000697965.2{free}/g 
+s/GCA_001270265.1.faa.*.1/GCA_001270265.1{free}/g 
+s/GCA_001683495.1.faa.*.1/GCA_001683495.1{free}/g 
+s/GCA_002007205.1.faa.*.1/GCA_002007205.1{free}/g 
+s/GCA_002940685.1.faa.*.1/GCA_002940685.1{free}/g 
+s/GCA_003217195.1.faa.*.1/GCA_003217195.1{free}/g 
+s/GCA_003269115.1.faa.*.1/GCA_003269115.1{free}/g 
+s/GCA_013283195.1.faa.*.1/GCA_013283195.1{free}/g 
+s/GCA_000583045.1.faa.*.1/GCA_000583045.1{free}/g 
+s/GCA_001723275.1.faa.*.1/GCA_001723275.1{mutualist}/g 
+s/GCA_000510685.1.faa.*.1/GCA_000510685.1{mutualist}/g 
+s/GCA_002078505.1.faa.*.1/GCA_002078505.1{mutualist}/g 
+s/GCA_002093415.1.faa.*.1/GCA_002093415.1{mutualist}/g 
+s/GCA_002093435.1.faa.*.1/GCA_002093435.1{mutualist}/g 
+s/GCA_002093495.1.faa.*.1/GCA_002093495.1{mutualist}/g 
+s/GCA_002093525.1.faa.*.1/GCA_002093525.1{mutualist}/g 
+s/GCA_001651865.1.faa.*.1/GCA_001651865.1{mutualist}/g 
+s/GCA_013283645.1.faa.*.1/GCA_013283645.1{mutualist}/g 
+s/GCA_013283665.1.faa.*.1/GCA_013283665.1{mutualist}/g 
+s/GCA_001704765.1.faa.*.1/GCA_001704765.1{mutualist}/g 
+s/GCA_000261485.1.faa.*.1/GCA_000261485.1{mutualist}/g 
+s/GCA_001976035.1.faa.*.1/GCA_001976035.1{free}/g 
+s/GCA_003208275.1.faa.*.1/GCA_003208275.1{free}/g 
+s/GCA_000378985.1.faa.*.1/GCA_000378985.1{mutualist}/g 
+s/GCA_001695835.1.faa.*.1/GCA_001695835.1{free}/g 
+s/GCA_001695795.1.faa.*.1/GCA_001695795.1{free}/g 
+s/GCA_001695785.1.faa.*.1/GCA_001695785.1{free}/g 
+s/GCA_001695855.1.faa.*.1/GCA_001695855.1{free}/g 
+s/GCA_001695865.1.faa.*.1/GCA_001695865.1{free}/g 
+s/GCA_001695895.1.faa.*.1/GCA_001695895.1{free}/g 
+s/GCA_001695905.1.faa.*.1/GCA_001695905.1{free}/g 
+s/GCA_001854885.1.faa.*.1/GCA_001854885.1{mutualist}/g 
+s/GCA_003355565.1.faa.*.1/GCA_003355565.1{free}/g 
+s/GCA_002885935.1.faa.*.1/GCA_002885935.1{mutualist}/g 
+s/GCA_003024455.1.faa.*.1/GCA_003024455.1{free}/g 
+s/GCA_900113205.1.faa.*.1/GCA_900113205.1{free}/g 
+s/GCA_001425885.1.faa.*.1/GCA_001425885.1{free}/g 
+s/GCA_001425225.1.faa.*.1/GCA_001425225.1{free}/g 
+s/GCA_001426365.1.faa.*.1/GCA_001426365.1{free}/g 
+s/GCA_001426465.1.faa.*.1/GCA_001426465.1{free}/g 
+s/GCA_001426785.1.faa.*.1/GCA_001426785.1{free}/g 
+s/GCA_001428785.1.faa.*.1/GCA_001428785.1{free}/g 
+s/GCA_001429745.1.faa.*.1/GCA_001429745.1{free}/g 
+s/GCA_001429285.1.faa.*.1/GCA_001429285.1{free}/g 
+s/GCA_001424825.1.faa.*.1/GCA_001424825.1{free}/g 
+s/GCA_001426275.1.faa.*.1/GCA_001426275.1{free}/g 
+s/GCA_001427045.1.faa.*.1/GCA_001427045.1{free}/g 
+s/GCA_001429125.1.faa.*.1/GCA_001429125.1{free}/g 
+s/GCA_001429005.1.faa.*.1/GCA_001429005.1{free}/g 
+s/GCA_002892495.1.faa.*.1/GCA_002892495.1{mutualist}/g 
+s/GCA_000421085.1.faa.*.1/GCA_000421085.1{mutualist}/g 
+s/GCA_000513895.1.faa.*.1/GCA_000513895.1{mutualist}/g 
+s/GCA_900103045.1.faa.*.1/GCA_900103045.1{free}/g 
+s/GCA_000799055.1.faa.*.1/GCA_000799055.1{free}/g 
+s/GCA_001651855.1.faa.*.1/GCA_001651855.1{mutualist}/g 
+s/GCA_001889105.1.faa.*.1/GCA_001889105.1{mutualist}/g 
+s/GCA_002909045.1.faa.*.1/GCA_002909045.1{mutualist}/g 
+s/GCA_002909075.1.faa.*.1/GCA_002909075.1{mutualist}/g 
+s/GCA_000705595.2.faa.*.1/GCA_000705595.2{mutualist}/g 
+s/GCA_000427465.1.faa.*.1/GCA_000427465.1{mutualist}/g 
+s/GCA_002531965.1.faa.*.1/GCA_002531965.1{mutualist}/g 
+s/GCA_002944405.1.faa.*.1/GCA_002944405.1{mutualist}/g 
+s/GCA_000261845.1.faa.*.1/GCA_000261845.1{mutualist}/g 
+s/GCA_003177055.1.faa.*.1/GCA_003177055.1{mutualist}/g 
+s/GCA_000261885.1.faa.*.1/GCA_000261885.1{mutualist}/g 
+s/GCA_000261905.1.faa.*.1/GCA_000261905.1{mutualist}/g 
+s/GCA_000261925.1.faa.*.1/GCA_000261925.1{mutualist}/g 
+s/GCA_000261945.1.faa.*.1/GCA_000261945.1{mutualist}/g 
+s/GCA_000261965.1.faa.*.1/GCA_000261965.1{mutualist}/g 
+s/GCA_000219415.2.faa.*.1/GCA_000219415.2{mutualist}/g 
+s/GCA_000283895.1.faa.*.1/GCA_000283895.1{mutualist}/g 
+s/GCA_000018545.1.faa.*.1/GCA_000018545.1{mutualist}/g 
+s/GCA_001461695.1.faa.*.1/GCA_001461695.1{mutualist}/g 
+s/GCA_000265205.2.faa.*.1/GCA_000265205.2{mutualist}/g 
+s/GCA_002864945.1.faa.*.1/GCA_002864945.1{mutualist}/g 
+s/GCA_002864955.1.faa.*.1/GCA_002864955.1{mutualist}/g 
+s/GCA_002864985.1.faa.*.1/GCA_002864985.1{mutualist}/g 
+s/GCA_002865005.1.faa.*.1/GCA_002865005.1{mutualist}/g 
+s/GCA_002865025.1.faa.*.1/GCA_002865025.1{mutualist}/g 
+s/GCA_002865035.1.faa.*.1/GCA_002865035.1{mutualist}/g 
+s/GCA_002865045.1.faa.*.1/GCA_002865045.1{mutualist}/g 
+s/GCA_002865055.1.faa.*.1/GCA_002865055.1{mutualist}/g 
+s/GCA_002865105.1.faa.*.1/GCA_002865105.1{mutualist}/g 
+s/GCA_002865125.1.faa.*.1/GCA_002865125.1{mutualist}/g 
+s/GCA_002865145.1.faa.*.1/GCA_002865145.1{mutualist}/g 
+s/GCA_002865155.1.faa.*.1/GCA_002865155.1{mutualist}/g 
+s/GCA_002865185.1.faa.*.1/GCA_002865185.1{mutualist}/g 
+s/GCA_002865225.1.faa.*.1/GCA_002865225.1{mutualist}/g 
+s/GCA_002865265.1.faa.*.1/GCA_002865265.1{mutualist}/g 
+s/GCA_000419665.1.faa.*.1/GCA_000419665.1{mutualist}/g 
+s/GCA_000378785.1.faa.*.1/GCA_000378785.1{mutualist}/g 
+s/GCA_000372345.1.faa.*.1/GCA_000372345.1{mutualist}/g 
+s/GCA_000419785.1.faa.*.1/GCA_000419785.1{mutualist}/g 
+s/GCA_000017145.1.faa.*.1/GCA_000017145.1{mutualist}/g 
+s/GCA_000747295.1.faa.*.1/GCA_000747295.1{mutualist}/g 
+s/GCA_000968555.1.faa.*.1/GCA_000968555.1{mutualist}/g 
+s/GCA_002197025.1.faa.*.1/GCA_002197025.1{mutualist}/g 
+s/GCA_002197065.1.faa.*.1/GCA_002197065.1{mutualist}/g 
+s/GCA_002197085.1.faa.*.1/GCA_002197085.1{mutualist}/g 
+s/GCA_002197105.1.faa.*.1/GCA_002197105.1{mutualist}/g 
+s/GCA_002197125.1.faa.*.1/GCA_002197125.1{mutualist}/g 
+s/GCA_002197145.1.faa.*.1/GCA_002197145.1{mutualist}/g 
+s/GCA_002197165.1.faa.*.1/GCA_002197165.1{mutualist}/g 
+s/GCA_002197445.1.faa.*.1/GCA_002197445.1{mutualist}/g 
+s/GCA_002197465.1.faa.*.1/GCA_002197465.1{mutualist}/g 
+s/GCA_002215195.1.faa.*.1/GCA_002215195.1{mutualist}/g 
+s/GCA_002302355.1.faa.*.1/GCA_002302355.1{mutualist}/g 
+s/GCA_002302375.1.faa.*.1/GCA_002302375.1{mutualist}/g 
+s/GCA_002807095.1.faa.*.1/GCA_002807095.1{mutualist}/g 
+s/GCA_003034185.1.faa.*.1/GCA_003034185.1{mutualist}/g 
+s/GCA_003044175.2.faa.*.1/GCA_003044175.2{mutualist}/g 
+s/GCA_003044215.2.faa.*.1/GCA_003044215.2{mutualist}/g 
+s/GCA_003692735.1.faa.*.1/GCA_003692735.1{free}/g 
+s/GCA_900107055.1.faa.*.1/GCA_900107055.1{mutualist}/g 
+s/GCA_900108935.1.faa.*.1/GCA_900108935.1{mutualist}/g 
+s/GCA_000006965.1.faa.*.1/GCA_000006965.1{mutualist}/g 
+s/GCA_000287435.1.faa.*.1/GCA_000287435.1{mutualist}/g 
+s/GCA_000346065.1.faa.*.1/GCA_000346065.1{mutualist}/g 
+s/GCA_000375585.1.faa.*.1/GCA_000375585.1{mutualist}/g 
+s/GCA_000287415.1.faa.*.1/GCA_000287415.1{mutualist}/g 
+s/GCA_000287455.1.faa.*.1/GCA_000287455.1{mutualist}/g 
+s/GCA_000287575.1.faa.*.1/GCA_000287575.1{mutualist}/g 
+s/GCA_000287555.1.faa.*.1/GCA_000287555.1{mutualist}/g 
+s/GCA_000287535.1.faa.*.1/GCA_000287535.1{mutualist}/g 
+s/GCA_000473425.1.faa.*.1/GCA_000473425.1{mutualist}/g 
+s/GCA_000287515.2.faa.*.1/GCA_000287515.2{mutualist}/g 
+s/GCA_000147775.3.faa.*.1/GCA_000147775.3{mutualist}/g 
+s/GCA_000473405.1.faa.*.1/GCA_000473405.1{mutualist}/g 
+s/GCA_000287375.1.faa.*.1/GCA_000287375.1{mutualist}/g 
+s/GCA_000287495.1.faa.*.1/GCA_000287495.1{mutualist}/g 
+s/GCA_000236945.2.faa.*.1/GCA_000236945.2{mutualist}/g 
+s/GCA_000427585.1.faa.*.1/GCA_000427585.1{mutualist}/g 
+s/GCA_000320385.2.faa.*.1/GCA_000320385.2{mutualist}/g 
+s/GCA_000428005.1.faa.*.1/GCA_000428005.1{mutualist}/g 
+s/GCA_000287475.1.faa.*.1/GCA_000287475.1{mutualist}/g 
+s/GCA_000428025.1.faa.*.1/GCA_000428025.1{mutualist}/g 
+s/GCA_000419645.1.faa.*.1/GCA_000419645.1{mutualist}/g 
+s/GCA_000304415.1.faa.*.1/GCA_000304415.1{mutualist}/g 
+s/GCA_000427745.1.faa.*.1/GCA_000427745.1{mutualist}/g 
+s/GCA_001050915.2.faa.*.1/GCA_001050915.2{mutualist}/g 
+s/GCA_000218265.1.faa.*.1/GCA_000218265.1{mutualist}/g 
+s/GCA_000510665.1.faa.*.1/GCA_000510665.1{mutualist}/g 
+s/GCA_000427485.1.faa.*.1/GCA_000427485.1{mutualist}/g 
+s/GCA_001651875.1.faa.*.1/GCA_001651875.1{mutualist}/g 
+s/GCA_002002725.1.faa.*.1/GCA_002002725.1{free}/g 
+s/GCA_002531555.1.faa.*.1/GCA_002531555.1{mutualist}/g 
+s/GCA_000261005.1.faa.*.1/GCA_000261005.1{mutualist}/g 
+s/GCA_002531875.1.faa.*.1/GCA_002531875.1{mutualist}/g 
+s/GCA_001461715.1.faa.*.1/GCA_001461715.1{free}/g 
+s/GCA_001461685.1.faa.*.1/GCA_001461685.1{mutualist}/g 
+s/GCA_001461765.1.faa.*.1/GCA_001461765.1{free}/g 
+s/GCA_002216665.1.faa.*.1/GCA_002216665.1{free}/g 
+s/GCA_002885915.1.faa.*.1/GCA_002885915.1{free}/g 
+s/GCA_900103435.1.faa.*.1/GCA_900103435.1{free}/g 
+s/GCA_002532005.1.faa.*.1/GCA_002532005.1{mutualist}/g 
+s/GCA_000969585.1.faa.*.1/GCA_000969585.1{mutualist}/g 
+s/GCA_001461705.1.faa.*.1/GCA_001461705.1{free}/g' $file
+done
+
+## Redo the trees 
+
+vi raxml_job.sh
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name raxml_sin
+#SBATCH --output=raxml_sin_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+## Remove the labels from phy files 
+
+sed -i 's/{free}//g' *.fas.phy
+sed -i 's/{mutualist}//g' *.fas.phy
+
+## Make list of genes 
+
+ls *.phy > OrthologNamesFile
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+
+## Need to change one species GCA_002197125.1{mutualist} GCA_002197125.1{free} to not mutualist (bc it had no nod genes and only one nif gene) 
+sed -i 's/GCA_002197125.1{mutualist}/GCA_002197125.1{free}/g' RAxML_bestTree* 
+## Make sure to go back and change in the excel file - may have already done thsi not sure 
+
+## Run hyphy RELAX model! Just change the test and reference (but actually I don't think it matters)  
+
+vi hyphy_job.sh
+
+#!/bin/bash
+#SBATCH --nodes=15
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name hyphy_sin
+#SBATCH --output=hyphy_sin_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+while read name; do 
+	hyphy RELAX --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree --test mutualist --reference free > "$name"_relax.out
+done < OrthologNamesFile
+
+## Copy the extra files to new folder 
+xargs -a extra_trees cp -t extra_hyphy
+
+remember to remove the 33333 files from previous folder 
+ls *.phy > OrthologNamesFile
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Copy again 
+xargs -a extra_extra cp -t extra_extra_hyphy
+
+## Okay now running hopefully the last of the sino genes for hyphy
+## Pick new pairs of rhizobia to do the paired wilcoxon tests on and then also look at plasmids vs the whole genome 
+
+## Run again! 
+sed -i 's/.best.fas.phy//g' new_list
+
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name hyphy_sin2
+#SBATCH --output=hyphy_sin2_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+while read name; do 
+	hyphy RELAX --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree --test mutualist --reference free > "$name"_relax.out
+done < new_list
+
+
+
+## Make the tree 
+
+sed -i 's/{mutualist}/ #1 /g' RAxML_bestTree*
+sed -i 's/{free}/ #0 /g' RAxML_bestTree*
+
+# Duplicate the tree 
+ls RAxML_bestTree* > tree_list 
+sed -i 's/RAxML_bestTree.//g' tree_list
+sed -i 's/.tree//g' tree_list
+
+# Add the second tree to second line 
+while read file; do
+	awk '{print ">"$0}1' RAxML_bestTree."$file".tree > "$file"_tree.trees
+done < tree_list
+
+# Replace labels in the first line 
+sed -i '1s/ #0 //g' *tree.trees
+sed -i '1s/ #1 //g' *tree.trees
+sed -i '1!b;s/>//' *tree.trees
+sed -i '1 i\\t2' *tree.trees
+
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' two_rate_gain.ctl > "$name".ctl
+done < tree_list 
+
+## For loop is in script called PAML_run
+## This will run PAML on all the genes  
+## For some reason this didn't take too long on ohta server hmmm... suspicious?  
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+
+
+
+
+## Doing 2 rate paml run on the sino-ensi clade 
+## Complete genes 388 
+## Total genes 544
+
+
+## Trying to get back into the two rate paml model for the sinorhizobium tree 
+## how many results 
+
+ls -1 *.out | wc -l  # 458 genes with results for all these rhizobia species/strains 
+
+## THis was a test of 1 or 2 rate mode - how many genes show signigicant difference and therefore different ratios 
+## The mutualist and free living strains were separated 
+## So the results are here, just need to extract them
+
+## Potential code for the 2 rate value extraction starting here 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+ 
+while read name; do
+	grep -A4 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+
+# Move the files to new folder and then run this 
+wc -l Ortholog_names # 457 genes total  
+
+grep -Ril "1sig" *treecomp > 1sig_results
+wc -l 1sig_results # 2 sig genes 
+
+grep -Ril "2sig" *treecomp > 2sig_results
+wc -l 2sig_results # 405 sig genes  
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  2: 
+sed -i 's/_treecomp//g' 2sig_results
+
+while read file; do 
+	sed -ne '/TREE #  2:/,$ p' "$file"_result.out > "$file"_tree2.out
+done < 2sig_results
+
+# Extract the values 
+for f in *tree2.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_2ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_2ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_2ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_tree2_2ratio_tree//g' $f
+done 
+
+
+# Count how many lines start with GCA because these are the individual genomes we tested 
+grep '^GCA' OG0001443_tree2_2ratio_tree_final_table | wc -l
+# 104 strains 
+
+# Only take the first 104 lines 
+while read file; do 
+	head -104 "$file"_tree2_2ratio_tree_final_table > "$file"_new_table
+done < 2sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > sino_results.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' sino_results.txt 
+
+# Here are the values! 
+# Now this is for all the strains even though all the mutualists will have the same value for each gene and all the free living will have the same value for each gene so I will just pick one representative to look at 
+# But I got it! 
+# GCA_001723275.1 has nodulation genes 
+# GCA_001695795.1 does not have nodulation genes 
+# So these can be the ones I take and then convert their name to symbiotic and free-living 
+
+grep -E '^(GCA_001723275.1|GCA_001695795.1)' sino_results2.txt > sino_clean.csv
+
+wc -l sino_clean.csv
+wc -l sino_results2.txt
+
+# Ok this worked! Now fix the headers and change the strain names to symbiotic or free living 
+
+sed -i 's/GCA_001723275.1/symbiotic/g' sino_clean.csv
+sed -i 's/GCA_001695795.1/freeliving/g' sino_clean.csv
+
+# Make the headers in vi 
+# Also put in the commas 
+
+sed -i 's/\t/,/g' sino_clean2.csv
+
+
+
+# divide into chr and plasmids
+# Look back at the faa files to search for noe and nif genes and pull those out of one representative genome 
+# Also pick one representative genome and find the plasmid and chr orthologs and code those as well 
+# Look at the s. meliloti 1021 one because it has chromsome and plasmids GCA_002197445.1
+
+# Go into faa files and check on the s meliloti 1021 strain to search for nod genes and pull out those orthologs 
+
+grep 'nodulation\|Nod\|Nif\|Noe\|Nop\|Nfe\|Fix\Nol\|fixation\|nitrogenase' GCA_002197445.1.faa > GCA_002197445.1.symgenes
+# Count the number 
+wc -l GCA_002197445.1.symgenes # 25 genes (seems small?) 
+
+grep '(plasmid)' GCA_002197445.1.faa > GCA_002197445.1.plasmid
+wc -l GCA_002197445.1.plasmid # 3375 genes for the plasmid 
+
+# Remove the spaces 
+sed 's/\s.*$//' GCA_002197445.1.plasmid > GCA_002197445.1.clean.plasmid
+sed -i 's/>//' GCA_002197445.1.clean.plasmid
+
+# Now search for these in the orthologs 
+grep -Fw -f GCA_002197445.1.clean.plasmid Orthogroups.tsv > plasmids_orthos
+
+wc -l plasmids_orthos # 2870 orthos 
+wc -l Orthogroups.tsv # 16082 orthos 
+
+# Then match these names with the orthologs
+
+
+ 
+
+# search for all the nodulation genes across all the genomes (but don't do this for the plasmid) 
+
+for f in *.faa
+do
+	grep 'nodulation\|Nod\|Nif\|Noe\|Nop\|Nfe\|Fix\Nol\|fixation\|nitrogenase' $f > ${f%%.*}.symgenes2
+done
+
+# Combine the genes 
+cat *.symgenes2 > sino_nodgenes
+
+# Clean up the file 
+# Remove the spaces 
+sed 's/\s.*$//' sino_nodgenes > sino_nodgenes.clean
+sed -i 's/>//' sino_nodgenes.clean
+
+# Pull out the appropriate ortho codes 
+
+grep -Fw -f sino_nodgenes.clean Orthogroups.tsv > nodgenes_orthogs
+wc -l nodgenes_orthogs # 114 genes (I think that makes more sense right?) 
+
+# Clean up final files for import into R to filter for psmB genes 
+
+sed 's/\s.*$//' nodgenes_orthogs > nodgenes_orthogs_clean.csv
+sed 's/\s.*$//' plasmids_orthos > plasmids_orthos_clean.csv
+
+
+
+
+
+## Try splitting up the Sino strains by psymB and everything else because psymB is the only consistent plamsid among all the strains 
+## Find the psymB plasmids in the strain GCA_000006965.1.fna 
+## psymB code is AL591985.1 
+
+## Count the number 
+wc -l new_GCA_000006965.1.fna # 81697 genes 
+
+## Pull out the psymB genes 
+grep 'AL591985.1' new_GCA_000006965.1.fna > GCA_000006965.1.plasmid
+wc -l GCA_000006965.1.plasmid # 1584 genes for the plasmid 
+
+## Clean up the file 
+sed 's/GCA_000006965.1.fna_lcl|AL591985.1_cds_//' GCA_000006965.1.plasmid > GCA_000006965.1.plasmid.clean
+sed 's/_.*//' GCA_000006965.1.plasmid.clean > GCA_000006965.1.plasmid.clean2
+sed -i 's/>//' GCA_000006965.1.plasmid.clean2
+
+## Now identify which orthologs are the ones that are
+## Identify file name with the codes 
+## Put the files in a new folder 
+
+grep -f GCA_000006965.1.plasmid.clean2 *.fna -lR > psymBorthosTest
+grep -f GCA_000006965.1.plasmid.clean2 OG* -lR > psymBorthos2
+
+## Clean the file and take into R 
+
+# sed 's/.fna//' psymBorthos > psymBorthos2
+wc -l psymBorthos2 # 50 genes in total that are on pSymB plasmid in our analysis 
+
+
+
+# Try a different assembly 
+
+## Count the number 
+wc -l new_GCA_000147775.3.fna # 83447 genes 
+
+## Pull out the psymB genes 
+grep 'CP002742.1' new_GCA_000147775.3.fna > GCA_000147775.3.plasmid
+wc -l GCA_000147775.3.plasmid # 1517 genes for the plasmid 
+
+## Clean up the file 
+sed 's/>GCA_000147775.3.fna_lcl|CP002742.1_cds_//' GCA_000147775.3.plasmid > GCA_000147775.3.plasmid.clean
+sed 's/_.*//' GCA_000147775.3.plasmid.clean > GCA_000147775.3.plasmid.clean2
+
+
+## Now identify which orthologs are the ones that are
+## Identify file name with the codes 
+## Put the files in a new folder 
+
+grep -f GCA_000147775.3.plasmid.clean2 OG* -lR > psymBorthosMED2
+
+## Clean the file and take into R 
+
+
+## Try a different assembly! 
+
+## Count the number 
+wc -l new_GCA_002197445.1.fna # 88832 genes 
+
+## Pull out the psymB genes 
+grep 'CP021802.1' new_GCA_002197445.1.fna > GCA_002197445.1.plasmid
+wc -l GCA_002197445.1.plasmid # 1963 genes for the plasmid 
+
+## Clean up the file 
+sed 's/>GCA_002197445.1.fna_lcl|CP021802.1_cds_//' GCA_002197445.1.plasmid > GCA_002197445.1.plasmid.clean
+sed 's/_.*//' GCA_002197445.1.plasmid.clean > GCA_002197445.1.plasmid.clean2
+
+## Delete the wrong lines 
+sed '/\[locus/d' GCA_002197445.1.plasmid.clean2 > GCA_002197445.1.plasmid.clean3
+
+## Identify psymB genes in orthos 
+grep -f GCA_002197445.1.plasmid.clean3 OG* -lR > psymBorthosMEL
+
+wc -l psymBorthosMEL # 130 plasmid B genes! 
+
+## Take over to R and test it out! 
+
+## How to find the location of the file 
+find /ohta/tia.harrison/ -type f -iname GCA_002197445.1.plasmid
+
+## Get the codes for the chromosome and pSymA just in case 
+
+############ NEEEEEEEEED TOOOOOOOO STAAAAAAART HEEEEEEEERE ANNNNNND FIIIIIIIIIX THIIIIIIIIISSSSSSS ####################
+
+grep 'CP021803.1' new_GCA_002197445.1.fna > GCA_002197445.1.Aplasmid
+wc -l GCA_002197445.1.plasmid # 1963 genes for the plasmid 
+
+
+
+## Response: how distantly related are they? 
+## In general I think if your question is "do mutualists or non-mutualists have a faster rate of molecular evolution in these genes", then the variation across branch is less important than the average
+## and that two-rate model should get the averages
+## of course, it's possible that the averages could be inflated by just 1 or 2 species with really high w
+## Maybe try playing around with models that allow for more rate variation? Using likelihood ratios
+## For instance if a 3+ rate model isn't a better fit over your two-rate model according to AIC or BIC, then you're probably fine
+
+## make list of the new names 
+## Remove .best.fas.phy
+
+sed -i 's/.best.fas.phy//g' extra_names
+## Rerun the code to finish off those genes! 
+
+
+## Pick new pairs! Including from the Sino clade 
+## Gains of mutualism in the sinorhizobium clade 
+GCA_013283665.1 # mutualist in nm clade (gain) 
+GCA_001683495.1 # Non mutualist relative 
+
+
+## Losses of mutualism in the sinorhizobium clade 
+GCA_002885915.1 # Non mutualist in m clade (loss) 
+GCA_002807095.1 # mutualist 
+
+GCA_002892495.1 # Non mutualist in m clade (loss) 
+GCA_000510665.1 # Mutualist 
+
+GCA_003692735.1 # Non mutualist (losss) 
+GCA_000427745.1 # Mutualist 
+
+
+
+## Try the beta and alpha trees as well for hyphy tests 
+## Put these in capsicum 
+
+
+
+

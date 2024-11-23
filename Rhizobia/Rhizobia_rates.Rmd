@@ -1,0 +1,1001 @@
+---
+title: "Rhizobia dnds"
+author: "Tia Harrison"
+date: "16/06/2022"
+output: github_document 
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Load the packages 
+```{r packages}
+library(tidyverse)
+library(multcomp)
+library(tidyverse)
+library(nationalparkcolors)
+library(coin)
+library(ggpubr)
+library(rstatix)
+library(phytools)
+library(geiger)
+library(ape)
+library(forcats)
+library(ggh4x)
+library(plotrix)
+library(qqman)
+library(lsmeans)
+```
+
+
+## Load the new dataset and explore
+Data set has been cleaned up in the previous script. 
+If dnds value is higher than 10 remove that gene because probably an error in assembly or annotation. 
+
+This data is based on single copy orthologs in the genomes. This would be more conservative that taking in paralogs into the data. Harder to figure out what to do with the paralogs anyways. Especially if you want to get a genome wide average dnds rate. 
+
+```{r data}
+# Load the data 
+rhizobia_dnds0<-read_csv("Rhizobia_pair2NEW_results.csv")
+# 22 659 rows
+
+# Remove the Sinorhizobium pair - only used in the tree to get better dnds ratios 
+rhizobia_dnds<-rhizobia_dnds0 %>% 
+  filter(Species!="Sinorhizobium_M4_45") %>%
+  filter(Species!="Sinorhizobium_meliloti")
+
+rhizobia_dnds %>%
+  group_by(Gene) %>%
+  tally() # 2812 genes 
+
+rhizobia_dnds %>%
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==14) # 438 genes shared before 
+
+# Remove abnormally high dnds values 
+rhizobia_dnds2<-rhizobia_dnds%>%
+  filter(dnds<10)
+
+# are there high dnds ratios? 
+rhizobia_dnds%>%
+  filter(dnds>10) # Yes indeed 
+
+# See how many data points are in each pair
+# This combines both species in the pair so it will be roughly double the number of genes 
+rhizobia_dnds2%>% 
+  group_by(Pair)%>%
+  tally()
+
+# How many genes per species 
+rhizobia_dnds2%>% 
+  group_by(Species)%>%
+  tally()
+
+# How many orthologs 
+rhizobia_dnds2 %>%
+  group_by(Gene) %>%
+  tally() %>%
+  filter(n==14)
+# 277 genes found in all 14 genomes 
+
+# How many orthologs overall 
+rhizobia_dnds2 %>%
+  group_by(Gene) %>%
+  tally() #2812 
+```
+## Paired Wilcoxon tests 
+Test for genome wide differences in rates of molecular evolution 
+
+```{r}
+# Run the wilcoxon tests 
+will_function2<- function(pair){
+  
+  # Subset each pair 
+rhizb<- rhizobia_dnds2%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-rhizb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+rhizb_new<- rhizb%>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+rhizb_new2<-rhizb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+pairb_test<-wilcox.test(rhizb_new2$F, rhizb_new2$M, paired=TRUE)
+return(pairb_test)
+
+} 
+
+gene_count2<- function(pair){
+    # Subset each pair 
+rhizb<- rhizobia_dnds2%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-rhizb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+return(genesb)
+}
+
+will_function_dir<- function(pair){
+  
+  # Subset each pair 
+rhizb<- rhizobia_dnds2%>%
+  filter(Pair==pair)
+  
+  # Make list of genes without missing data 
+genesb<-rhizb%>%
+  filter(!is.na(dnds))%>%
+  group_by(Gene)%>%
+  tally() %>%
+  filter(n==2)
+  
+genesb_list<-data.frame(Gene=genesb$Gene)
+
+  # Keep only new genes 
+rhizb_new<- rhizb%>%
+  semi_join(genesb_list, by="Gene")
+
+# Make into the right data format
+rhizb_new2<-rhizb_new %>%
+  select(Gene, Mutualist, dnds) %>%
+  pivot_wider(names_from = Mutualist, values_from = dnds) 
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+# And this is a mutualism gain so the direction is correct 
+# Less and sig means mutualist is greater than free
+pairb_test<-wilcox.test(rhizb_new2$F, rhizb_new2$M, paired=TRUE, alternative="less")
+return(pairb_test)
+
+}
+
+#will_function2("a") # not sig, loss Sinorhizo
+#gene_count2("a") # 965 genes 
+
+will_function2("b") # not sig, loss Brady 
+gene_count2("b") # 1154 genes 
+
+will_function2("c") # sig! Xanther gain 
+will_function_dir("c") # M is greater than F 
+gene_count2("c") # 988 genes 
+
+will_function2("d") # sig! Microvigra gain 
+will_function_dir("d") # M greater
+gene_count2("d") # 1052 genes 
+
+will_function2("e") # sig! Mesorhizobium loss 
+will_function_dir("e") # M greater
+gene_count2("e") #1090 genes 
+
+will_function2("f") # sig 
+will_function_dir("f") # M greater
+gene_count2("f") # 1288 genes 
+
+will_function2("g") # Just on the line Cupriavidus gain 0.06
+will_function_dir("g") # sig M is greater 
+gene_count2("g") # 836 genes 
+
+will_function2("h") # not sig Paraburkholderia gain 
+gene_count2("h") # 1074
+
+# Check the pairs 
+rhizobia_dnds2%>%
+  filter(Pair=="h")
+
+# Hmm it seems to be that mutualist is usually higher no matter whether it is a gain or loss 
+# This is same as the plants! 
+
+```
+
+## Plot the ratios 
+Now plot the ratios based on the ratios 
+
+```{r}
+# Change labels 
+rhizobia_dnds2_plot<-rhizobia_dnds2 %>%
+  mutate_if(is.character, 
+                str_replace_all, pattern = "_", replacement = " ")
+
+# Make dummy variable for visualization 
+# And clean up labels 
+rhizobia_dnds2_plot2<- rhizobia_dnds2_plot %>%
+   mutate(dummy="test") %>% 
+   mutate_at("Transition", str_replace, "gain", "mutualism gain") %>%
+   mutate_at("Transition", str_replace, "loss", "mutualism loss")
+
+
+# Make labels for the plot 
+# For number of pairs
+facet_labeller_pair <- function(variable, value) {
+  c(
+    "",
+    "*",
+    "*",
+    "*", 
+    "*",
+    "",
+    ""
+  )
+}
+
+
+facet_labbler_test <- function(variable, value) {
+  c(
+    ""
+  )
+}
+
+# Make level order for species for plotting 
+level_order<-c("Bradyrhizobium oligotrophicum", "Bradyrhizobium icense", "Mesorhizobium oceanicum","Mesorhizobium temperatum", "Rhizobium tubonense", "Rhizobium gallicum", "Xanthobacter autotrophicus", "Azorhizobium caulinodans", "Microvirga subterranea", "Microvirga vignae", "Cupriavidus alkaliphilus", "Cupriavidus taiwanensis", "Paraburkholderia caribensis",  "Paraburkholderia diazotrophica")
+
+# Bar plot 
+library(ggpubr)
+library(ggsignif)
+
+lifestyle<-park_palette("Saguaro")
+
+# Careful bc ylim causes data to be removed 
+# For a true zoom use coord_cartesian(ylim=c(0, 7)) but the coord_cartesian doesn't work with coord_flip so put the ylim in the coord_flip() argument 
+bp_free_rhiz<-ggplot(rhizobia_dnds2_plot2, aes(x=factor(Species, level = level_order), y=dnds, fill=Mutualist))+ 
+  #geom_boxplot(coef=0, outlier.shape=NA) + # To remove the outliers 
+  geom_boxplot(outlier.shape=NA) + # To remove the outliers 
+  # geom_boxplot() +
+  #coord_cartesian(ylim(-0.2,0.3)) +
+  (ylab("dN/dS ratio"))+
+  (xlab(""))+
+  scale_fill_manual(labels=c("non-symbiotic", "symbiotic"), values=lifestyle[c(1,3)])+
+  #coord_flip(ylim=c(-0.1, 0.65)) +
+  coord_flip(ylim=c(0, 0.18)) +
+  #coord_flip() +
+  #facet_nested(Transition + Pair ~ dummy, scales = "free_y", space = "free_y", switch = "y") +
+  #facet_nested(Transition + Pair ~ dummy, scales = "free", space="free", labeller= labeller( Pair=as_labeller(facet_labeller_pair), dummy=as_labeller(facet_labbler_test)), nest_line = element_line(linetype = 1)) +
+  #facet_nested(Transition + Pair ~ dummy, scales = "free", space="free", labeller= labeller( Pair=as_labeller(facet_labeller_pair), dummy=as_labeller(facet_labbler_test))) +
+  #facet_nested(Pair ~ dummy, scales = "free", space="free", labeller= labeller( Pair=as_labeller(facet_labeller_pair), dummy=as_labeller(facet_labbler_test))) +
+  facet_nested(Pair ~ dummy, scales = "free", space="free", labeller= labeller( Pair=as_labeller(facet_labeller_pair), dummy=as_labeller(facet_labbler_test))) +
+  theme_light() + 
+  #geom_text(data = ann_text,label = "*")+
+  theme_classic() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=8, face="italic"), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.text=element_text(size=9),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="top",
+        #strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        strip.background = element_blank()
+        #ggh4x.facet.nestline = element_line(colour = "black")
+        )
+
+bp_free_rhiz
+
+
+# This looks like mutualists are higher? I need to go back and look at that Wilcoxon test results but if this is correct then that is helpful! Then it matches the plant! 
+
+rhizobia_dnds2_plot2
+```
+
+
+## Find symbiotic genes 
+
+Plasmid information wasn't really there for most of the assemblies and some of the species might not have a dedicated plasmid but instead have just a symbiotic island. 
+
+So instead I'm going to search the annotated genes of the assemblies and pull out the genes (and corresponding ortholog name) for anything that matches nod, nif, noe, nol, nop, nfe, nodul, fix, fixation, nitrogenase 
+
+```{r}
+# Load the symbiotic codes 
+symgenes<-read_csv("symbiotic_orthos.csv")
+symgenes # Now there is likely some overlap but the genes might be different in the different pairs so prob want to filter by pair! 
+symgenes2<-symgenes %>%
+  distinct(Gene) # 33 genes total 
+symgenes2
+
+# Prep the data 
+sym_rhiz <- rhizobia_dnds2 %>%
+  filter(Gene %in% symgenes2$Gene)
+sym_rhiz # 269 rows 
+
+# Test a pair 
+sym_rhiz %>%
+  filter(Pair=="h") %>%
+  group_by(Pair) %>%
+  dplyr::select(Mutualist, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(!is.na(M) & !is.na(F)) %>%
+  mutate(diff=M-F) %>%
+  filter(diff>0)
+
+
+
+# Test one pair 
+sym_rhiz2 <- sym_rhiz %>%
+  #filter(Pair=="e") %>%
+  group_by(Pair) %>%
+  dplyr::select(Mutualist, Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(!is.na(M) & !is.na(F))
+sym_rhiz2 
+
+# Prep the dataset 
+sym_plot <- sym_rhiz2 %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  filter(Diff!=0) %>%
+  arrange(Diff) 
+  #mutate(Diff2=Diff) %>%
+  #mutate(Diff2=as.factor(Diff2)) %>%
+  #mutate(Diff2=factor(Diff2, Diff2)) # reorder based on the difference between the two ratios 
+sym_plot2 <- sym_plot %>%
+  mutate(Pair2=case_when( Pair=="b" ~ "Bradyrhizobium", 
+                            Pair=="c" ~ "Azorhizobium",
+                            Pair=="d" ~ "Microvigra",
+                            Pair=="e" ~ "Mesorhizobium",
+                            Pair=="f" ~ "Rhizobium",
+                            Pair=="g"~  "Cupriavidus",
+                            Pair=="h" ~ "Paraburkholderia"))
+
+# Plot the lollipop plot 
+sym_pop_plot<- ggplot(sym_plot2) + 
+  geom_segment(aes(x=fct_reorder(Gene, minus), y=M, xend=Gene, yend=F), color="grey") + 
+  geom_point(aes(x=Gene, y=M, color="M"), size=3.2) + 
+  geom_point(aes(x=Gene, y=F, color="F"), size=3.2) + 
+  scale_color_manual(labels=c("non-symbiotic", "symbiotic"), values=lifestyle[c(1,3)])+
+  coord_flip() + 
+  facet_grid(rows = vars(Pair2), space="free", scales="free") +
+  (xlab("Symbiotic genes"))+
+  (ylab("dN/dS ratio"))+
+  theme_light() + 
+  theme(axis.title = element_text(size=12), 
+        axis.text.y= element_text(size=9), 
+        axis.text.x= element_text(size=11),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.text=element_text(size=9),
+        #panel.grid = element_blank(),
+        panel.border = element_blank()
+  )
+sym_pop_plot
+
+
+
+
+#sym_pop_power<- sym_plot2 %>%
+#  filter(Pair2=="Brady.") %>%
+#  ggplot() + 
+#  geom_segment(aes(x=fct_reorder(Gene, minus), y=M, xend=Gene, yend=F), color="grey") + 
+#  geom_point(aes(x=Gene, y=M, color="M"), size=5) + 
+#  geom_point(aes(x=Gene, y=F, color="F"), size=5) + 
+#  scale_color_manual(labels=c("non-symbiotic", "symbiotic"), values=lifestyle[c(1,3)])+
+#  coord_flip() + 
+#  facet_grid(rows = vars(Pair2), space="free", scales="free") +
+#  (xlab("Symbiotic genes"))+
+#  (ylab("dN/dS ratio"))+
+#  theme_light() + 
+#  theme(axis.title = element_text(size=18), 
+#        axis.text.y= element_text(size=15), 
+#        axis.text.x= element_text(size=15),
+#        legend.title = element_blank(),
+#        legend.position = "top",
+#        legend.text=element_text(size=15),
+#        #panel.grid = element_blank(),
+#        panel.border = element_blank()
+#  )
+#sym_pop_power
+
+#ggsave(plot=sym_pop_power, "Bradytest.pdf", width=10, height=6)
+
+# What is the gene with the really high value? 
+#sym_plot2 %>%
+#  filter(Pair2=="Brady.")
+# Look up the code in the original sequence files 
+
+```
+Found the ortholog codes for gene names. Now search the genome files on the server for these gene functions/descriptions:
+
+grep BAF89407.1 new_GCA_000010525.1.faa
+grep ABS65365.1 new_GCA_000017645.1.faa 
+grep BAM88287.1 new_GCA_000344805.1.faa
+grep ANW03186.1 new_GCA_001693385.1.faa # Brady but its not really a nitrogen function here - it is a hypothetical protein??? 
+grep APO70279.1 new_GCA_001908615.1.faa # Fe-S cofactor nitrogenase synthesis protein on a rhizobium plasmid but not really in the bradyrhizobium genome as a nitrogen related gene 
+grep PAQ09936.1 new_GCA_002284575.1.faa
+grep PJR10728.1 new_GCA_002807095.1.faa
+
+A lot of iron-sulfur assembly proteins 
+
+Hmmmm, maybe I need to filter for genes that are just nod related in their own genome instead of calling all of them nitrogen related. That would reduce the number of genes but it might give a clearer pattern? It could be worth looking at and I already have that information in the gene file - no going back to the original genomes to get that information. 
+
+# Genes under positive selection 
+
+```{r}
+rhizobia_dnds2 %>%
+  filter(dnds>1) %>%
+  distinct(Gene)
+
+pos_genes_rhiz<-rhizobia_dnds2 %>%
+  dplyr::select(Mutualist, Pair,Transition, Gene, dnds) %>%
+  pivot_wider(names_from=Mutualist, values_from=dnds) %>%
+  filter(M > 1 | F >1 ) %>%
+  filter(M<7 & F<7) %>%
+  mutate(minus=M-F) %>%
+  mutate(Diff=abs(minus)) %>% 
+  arrange(Diff)
+
+
+pos_genes_rhiz %>%
+  filter(Pair=="g") 
+
+# really need the upset r plot for this to see if all species are sharing the same genes under positive selection 
+rhizobia_dnds_pos <- rhizobia_dnds2 %>%
+  mutate(Pos=ifelse(dnds>1, 1, 0)) %>%
+  dplyr::select(Species, Gene, Pos) %>%
+  pivot_wider(names_from=Species, values_from=Pos) 
+
+rhizobia_dnds2 %>%
+  mutate(Pos=ifelse(dnds>1, 1, 0)) %>%
+  filter(Pos==1) %>%
+  distinct()
+
+rhizobia_dnds_pos2 <- rhizobia_dnds_pos[complete.cases(rhizobia_dnds_pos), ] # Remove NA
+rhizobia_dnds_pos3 <-rhizobia_dnds_pos2[rowSums(rhizobia_dnds_pos2[-(1)]) !=0, ] # Remove 0s
+
+rhizobia_dnds_pos3<-data.frame(rhizobia_dnds_pos3) # 18 genes under positive selection in at least one species 
+rhizobia_dnds_pos3
+
+# Plot the upset r plot 
+# Try plotting an upsetr plot 
+library(UpSetR)
+
+# Test 
+upset(rhizobia_dnds_pos3,
+   # sets=c("Mesorhizobium_temperatum","Paraburkholderia_caribensis", "Paraburkholderia_diazotrophica", "Cupriavidus_taiwanensis","Cupriavidus_alkaliphilus"), keep.order=TRUE, 
+    sets.x.label = "Genes per Species", 
+    mainbar.y.label = "",
+    sets.bar.color = c(lifestyle[3],lifestyle[1],lifestyle[3], lifestyle[1], lifestyle[3]), 
+    main.bar.color= c(lifestyle[3],lifestyle[1],lifestyle[3], lifestyle[3], lifestyle[1])
+    ) 
+
+# This upsetR plot is on the full dataset - all asvs even though there is unequal sampling across the three regions 
+    
+
+```
+
+
+## Plot the big proteobacteria tree 
+
+
+```{r}
+proteo_tree <- read.newick("Proteo_tree.txt")
+proteo_data<- read_csv("Proteo_nodule.csv")
+
+library(ggstar)
+library(ggtree)
+library(treeio)
+library(TDbook)
+
+# Check out the tree
+bac_tree<- ggtree(proteo_tree, layout="fan", open.angle=10)
+bac_tree
+
+# Prep the data 
+# Get tips and label 
+bac_tips<-proteo_tree$tip.label
+bac_tips2<-data.frame(bac_tips)
+bac_tips3<-bac_tips2 %>%
+  mutate(Species=bac_tips) %>%
+  mutate(Nod=ifelse(Species %in% proteo_data$Species, "symbiotic", "non-symbiotic")) %>%
+  dplyr::select(Species, Nod)
+
+# Tree  
+prot <- ggtree(proteo_tree, layout="circular", branch.length = "none", open.angle=10, size=0.1) %<+% bac_tips3
+
+# Prep data again 
+pdata1<-rhizobia_dnds2 %>%
+  dplyr::select(Species, Mutualist) %>%
+  distinct()
+pdata1
+
+bac_tips4<-bac_tips3 %>%
+  mutate(Size=ifelse(Species %in% pdata1$Species, 0.8, 0.1)) %>%
+  mutate(Mutualist=ifelse(Nod=="mutualist", "M", "F")) %>%
+  filter(!is.na(Mutualist)) %>%
+  dplyr::select(Species, Mutualist, Size) %>%
+  mutate(Shape=ifelse(Species %in% pdata1$Species, "Y", "N"))
+
+# Add the additional information 
+prot_test <- prot %<+% bac_tips4  + 
+  geom_tippoint(aes(color = Nod), size=0.1, shape=16) + 
+    geom_tree(aes(color=Nod)) +
+    geom_tiplab(aes(color=Nod, align=TRUE,geom = "text", subset=c(label %in% pdata1$Species)), size=1.7, offset=0.7) +
+    scale_color_manual(values=lifestyle[c(3,1)], breaks = c("symbiotic", "non-symbiotic")) +
+  geom_star(mapping=aes(fill=Nod, size=Size, starshape=Shape), position="identity",starstroke=0.1) + 
+  scale_fill_manual(values=lifestyle[c(1,3)]) + 
+  scale_starshape_manual(values=c(15, 1)) + 
+  scale_size_continuous(range = c(1, 2.6)) + 
+  guides(size = FALSE, fill=FALSE, starshape=FALSE) + 
+  guides(color = guide_legend(override.aes = list(size=2))) + 
+  theme(legend.title = element_blank(), 
+        legend.text=element_text(size=12),
+        legend.position="top"
+        )
+prot_test
+
+
+
+# Test figure for plotting 
+
+prot1 <- ggtree(proteo_tree, aes(color=Nod, size=3), layout="circular", branch.length = "none", open.angle=10, size=0.1) %<+% bac_tips3
+
+# Add the additional information 
+prot_test2 <- prot1 %<+% bac_tips4  +
+  geom_tree(size=0.8) +
+  #geom_tippoint(aes(color = Nod), size=0.1, shape=16) + 
+  #geom_tiplab(aes(color=Nod, align=TRUE,geom = "text", subset=c(label %in% pdata1$Species)), size=1.7, offset=0.7) +
+  scale_color_manual(values=lifestyle[c(3,1)], breaks = c("symbiotic", "non-symbiotic")) +
+  geom_star(mapping=aes(fill=Nod, size=Size, starshape=Shape), position="identity",starstroke=0.1) + 
+  scale_fill_manual(values=c(lifestyle[1], lifestyle[3])) + 
+  scale_starshape_manual(values=c(15, 1)) + 
+  scale_size_continuous(range = c(0, 8)) + 
+  guides(size = FALSE, fill=FALSE, starshape=FALSE) + 
+  guides(color = guide_legend(override.aes = list(size=2))) + 
+  theme(legend.title = element_blank(), 
+        legend.text=element_text(size=12),
+        legend.position="top"
+        )
+prot_test2
+
+
+
+# Add the additional information 
+prot_test3 <- prot1 %<+% bac_tips4  +
+  geom_tree(size=0.8) +
+  #geom_tippoint(aes(color = Nod), size=0.1, shape=16) + 
+  geom_tiplab(aes(color=Nod, align=TRUE, geom = "text", subset=c(label %in% pdata1$Species)), size=1.7, offset=0.7) +
+  scale_color_manual(values=lifestyle[c(3,1)], na.value="lightgrey", breaks = c("symbiotic", "non-symbiotic")) +
+  geom_star(mapping=aes(fill=Nod, size=Size, starshape=Shape), position="identity",starstroke=0.1) + 
+  scale_fill_manual(values=c(lifestyle[1], lifestyle[3])) + 
+  scale_starshape_manual(values=c(15, 1)) + 
+  scale_size_continuous(range = c(0, 3)) + 
+  guides(size = FALSE, fill=FALSE, starshape=FALSE) + 
+  guides(color = guide_legend(override.aes = list(size=2))) + 
+  theme(legend.title = element_blank(), 
+        legend.text=element_text(size=12),
+        legend.position="top"
+        )
+prot_test3
+
+
+
+```
+
+
+# Sinorhizobium genomes 
+Here taking the genomes from the Fagorzi paper 
+Only two genes that have the nodulation key words were found and had dnds ratios calculated among the two clades 
+But we do have more plasmid genes (according to one genome annotations)
+
+```{r}
+
+# Get the info on all the samples 
+sublist<-read_csv("EniSamples.csv")
+fulllist<-read_csv("EniSamplesFull.csv")
+
+fulllist2<-fulllist %>%
+  filter(Assembly %in% sublist$Samples)
+write.csv(fulllist2, "EniSamplesClean.csv")
+
+# Load the data 
+sinotree1<-read_csv("sinotreefinal.csv")
+sinotree1 # 810 observations so 405 genes total 
+
+# Load list of pSymB genes 
+psymB<-read_csv("psymBorthosMEL.csv")
+psymB # 130 genes are in psymB 
+
+# Make new column of data 
+sinotree<-sinotree1%>%
+  mutate(psymB=ifelse(gene %in% psymB$psymB_codes, "Y", "N"))
+sinotree%>% 
+  filter(psymB=="Y") # 140 rows 
+
+# How many genes? 
+sinotree%>%
+  filter(psymB=="Y") %>%
+  group_by(gene) %>%
+  tally() # 70 genes in psymB! 
+
+# Remove dnds values greater than 10 
+sinotree2<-sinotree %>%
+  filter(dnds<10)
+sinotree2 # nothing removed! 
+
+sinotree2%>%
+  group_by(gene) %>%
+  tally()
+
+# Any under positive selection? 
+sinotree %>%
+  filter(dnds>1)
+
+# plot the result 
+sino_plot <- ggplot(sinotree2, aes(x=mutualist, y=dnds, fill=mutualist)) + 
+  #geom_boxplot(outlier.shape = NA) +
+  geom_boxplot() +
+  scale_fill_manual(values=c(lifestyle[1], lifestyle[3])) +
+  #scale_y_continuous(limits = c(0, 1)) +
+  ylab("dN/dS ratio") + 
+  ggsignif::geom_signif(annotations ="***", y_position = c(0.26), xmin = c(1), xmax =c(2), vjust=0.4, tip_length = 0) +
+  scale_x_discrete(labels=c("symbiotic" = "symbiotic", "freeliving" = "non-symbiotic"))+
+  xlab("") +
+  theme_light() + 
+  labs(tag = "(a)") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.text=element_text(size=9),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        #strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+sino_plot
+
+# Trying out other plots 
+paired_sino <- ggplot(sinotree2, aes(x=mutualist, y=dnds)) +
+  #geom_boxplot(aes(fill=Species)) + 
+  geom_line(aes(group=gene), alpha=0.6) + 
+  geom_point(size=1.5, alpha=0.6) +
+  #scale_fill_manual(labels=c("Free-living", "Mutualist"), values=lifestyle[c(1,3)])+
+  theme_classic()
+paired_sino # Hard to tell what's going on 
+
+# Calculate mean and se for the bar plot 
+sino_means <- sinotree2 %>%
+  dplyr::group_by(mutualist) %>%
+  dplyr::summarise(mean_dnds=mean(dnds, na.rm = TRUE), se=std.error(dnds), mutualist=mutualist) %>%
+  distinct()
+
+# Plot the means and se 
+sino_plot2 <- ggplot(sino_means, aes(x=mutualist, y=mean_dnds, fill=mutualist)) + 
+  geom_bar(aes(factor(mutualist), mean_dnds, fill = mutualist, group=mutualist), color="black", position = position_dodge(), stat = "identity") +
+  geom_errorbar(aes(ymin=mean_dnds-se, ymax=mean_dnds+se), width=.2, position=position_dodge(.9))+
+  scale_fill_manual(values=c(lifestyle[1], lifestyle[3])) +
+  ylab("dN/dS ratio") + 
+  xlab("") +
+  theme_light() + 
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        legend.title = element_blank(), 
+        legend.text=element_text(size=9),
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        #strip.text.x = element_blank(),
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+sino_plot2
+
+# Now do it for the plasmids and chromosomes separately! 
+# Make the labels 
+variable_names <- list(
+  "N" = "chromosome + other" ,
+  "Y" = "pSymB"
+)
+
+variable_labeller <- function(variable,value){
+  return(variable_names[value])
+}
+
+
+
+ann.data.s<-data.frame(
+  psymB="N",
+  start="freeliving",
+  end="symbiotic",
+  y=0.2,
+  label="***"
+)
+
+
+# Can we make one big facet plot of everything? Maybe just the split of chr and pls
+sino_plot3 <- ggplot(sinotree2, aes(x=mutualist, y=dnds, fill=mutualist)) + 
+  geom_boxplot() +
+  scale_fill_manual(values=c(lifestyle[1], lifestyle[3])) +
+  ylab("dN/dS ratio") + 
+  xlab("") +
+  scale_x_discrete(labels=c("symbiotic" = "symbiotic", "freeliving" = "non-symbiotic"))+
+  facet_wrap(~psymB, labeller=variable_labeller) +
+  geom_signif(data=ann.data.s, aes(xmin=start, xmax=end, annotations=label, y_position=y), manual=TRUE, inherit.aes = FALSE, vjust=0.4, tip_length=0) +
+  theme_light() +
+  labs(tag = "(b)") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        #panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        #strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+
+sino_plot3
+# Hmmm interesting! It looks like the plasmid genes have lower dnds values! This could mean that it is conserved and suggests its being swapped around and the chromosome is showing that when engaged in mutualism it impacts other parts of the genome (but not the symbiosis genes) which matches previous results :) 
+
+
+ggarrange(sino_plot,sino_plot3,
+             widths=c(1.2,2))
+
+```
+
+## Paired wilcoxon tests for the Sinorhizobium 
+
+```{r}
+# Make list of genes without missing data 
+genes_sino<-sinotree2%>%
+  filter(!is.na(dnds))%>%
+  group_by(gene)%>%
+  tally() %>%
+  filter(n==2)
+genes_sino # 405 total genes - and they are all here 
+  
+# Make into the right data format
+sinotree3<-sinotree2 %>%
+  select(gene, mutualist, dnds) %>%
+  pivot_wider(names_from = mutualist, values_from = dnds)
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+wilcox.test(sinotree3$symbiotic, sinotree3$freeliving, paired=TRUE)
+# It is significant! What is the direction? 
+# V = 49589
+
+wilcox.test(sinotree3$freeliving, sinotree3$symbiotic, paired=TRUE)
+# V = 32626
+
+# Test for the direction 
+# Greater and sig means free is greater than M 
+wilcox.test(sinotree3$freeliving, sinotree3$symbiotic, paired=TRUE, alternative="greater") # Not sig! 
+
+# Greater and sig means M is greater than F 
+wilcox.test(sinotree3$symbiotic, sinotree3$freeliving, paired=TRUE, alternative="greater") # Sig! So symbiotics are higher than freeliving ones! 
+
+```
+
+
+## Paired tests for chromosome and plasmid separately
+
+```{r}
+# Chromosome 
+# Make into the right data format
+sinochr<-sinotree2 %>%
+  filter(psymB=="N") %>%
+  select(gene, mutualist, dnds) %>%
+  pivot_wider(names_from = mutualist, values_from = dnds)
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+wilcox.test(sinochr$symbiotic, sinochr$freeliving, paired=TRUE)
+# It is significant! Symbiotic is higher than freeliving! 
+
+# Test for the direction 
+# Greater and sig means free is greater than M 
+wilcox.test(sinochr$freeliving, sinochr$symbiotic, paired=TRUE, alternative="greater") # Not sig! so symbiosis do have higher rates than freeliving on the chr! 
+
+# Plasmid 
+# Make into the right data format
+sinopls<-sinotree2 %>%
+  filter(psymB=="Y") %>%
+  select(gene, mutualist, dnds) %>%
+  pivot_wider(names_from = mutualist, values_from = dnds)
+
+# Run the paired test 
+# In this example, the differences is calculated F-M
+wilcox.test(sinopls$symbiotic, sinopls$freeliving, paired=TRUE)
+# Not significant! That means either direction? 
+
+# Test for the direction 
+# Greater and sig means free is greater than M 
+wilcox.test(sinopls$freeliving, sinopls$symbiotic, paired=TRUE, alternative="greater") # Not sig! Freeliving are not higher than symbiotic  
+
+wilcox.test(sinopls$symbiotic, sinopls$freeliving, paired=TRUE, alternative="greater") # Also not significant, so for plasmid genes there is no difference 
+
+# On plasmid genes there is no difference! 
+```
+## Plot the results together 
+
+```{r}
+# Plot the differences to see if that looks better! 
+sinotree4<-sinotree3 %>%
+  mutate(Diff=symbiotic-freeliving) %>%
+  mutate(region="genome")
+sinotree4 # so positive values are symbiotics are higher, neg values is free living is higher 
+
+genome_sino<-ggplot(sinotree4, aes(x="", y=Diff)) + 
+  geom_boxplot() + 
+  theme_light() +
+  xlab("genome wide") + 
+  ylab("symbiotic - free-living dN/dS") +
+  geom_hline(yintercept=0, linetype="dashed", color = "red") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        #panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        #strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+
+
+sinochr2<-sinochr%>%
+  mutate(Diff=symbiotic-freeliving) %>%
+  mutate(region="chr+other")
+
+sino_chrplus<-ggplot(sinochr2, aes(x="", y=Diff)) + 
+  geom_boxplot() + 
+  theme_light() +
+  xlab("chromosome + other") + 
+  ylab("symbiotic - free-living dN/dS") +
+  geom_hline(yintercept=0, linetype="dashed", color = "red") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        #panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        #strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+sino_chrplus
+
+sinopls2<-sinopls%>%
+  mutate(Diff=symbiotic-freeliving) %>%
+  mutate(region="pSymB")
+
+sino_pls<-ggplot(sinopls2, aes(x="", y=Diff)) + 
+  geom_boxplot() + 
+  theme_light() +
+  xlab("pSymB") + 
+  ylab("symbiotic - free-living dN/dS") +
+  geom_hline(yintercept=0, linetype="dashed", color = "red") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        #panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        #strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+sino_pls
+
+# Combine the datasets 
+sinowhole = rbind(sinopls2,sinochr2,sinotree4)
+sinowhole
+
+# Plot together! 
+diff_plot<-ggplot(sinowhole, aes(x=region, y=Diff)) + 
+  geom_boxplot() + 
+  theme_light() +
+  xlab("") + 
+  ylab("symbiotic - free-living dN/dS") +
+  geom_hline(yintercept=0, linetype="dashed", color = "red") +
+  theme(axis.title = element_text(size=10), 
+        axis.text.y= element_text(size=10), 
+        axis.text.x= element_text(size=10), 
+        #panel.border = element_blank(),
+        panel.grid = element_blank(),
+        legend.position="none",
+        strip.text.y = element_text(size = 23),
+        axis.line.x = element_line(color="grey", size = 0.5),
+        axis.line.y = element_line(color="grey", size = 0.5),
+        #strip.background = element_blank(), 
+        aspect.ratio=1.2
+        )
+diff_plot
+
+```
+
+
+
+## Plot the Ensifer/Sino tree 
+Need to filter out the tree for the samples we used in our analysis 
+
+```{r}
+# Need list of samples we used and whether they are S or NS 
+eni_samples<- read_csv("EniSamples.csv")
+# eni_samples # 157 samples 
+
+# Need list of all samples from the study 
+fagorzi<- read_csv("Fagorzi_data2.csv")
+# Make the labels for the tips of the trees 
+fagorzi2<- fagorzi %>%
+  unite("Label", c("Organism", "Strain"), sep="_")
+
+# Tree for all samples from the study 
+eni_tree<- read.tree("unrootedPhylogenyEnsifer.tre")
+
+# Filter data and tree and colour code based on samples used 
+fagorzi3<- fagorzi2 %>%
+  filter(Assembly %in% eni_samples$Samples)
+# fagorzi3 # 104 samples
+
+# list of samples to keep 
+species_keep<-fagorzi3$Label
+eni_tree_prune<- drop.tip(eni_tree, eni_tree$tip.label[-na.omit(match(species_keep, eni_tree$tip.label))])
+
+# New tree with the new tips 
+eni_tree_prune$tip.label
+
+```
+
+## Plot the sinorhizobium tree 
+
+```{r}
+# Prep the data 
+fagorzi_new<-fagorzi2 %>%
+  filter(Label %in% eni_tree_prune$tip.label)
+
+# Tree  
+eni_tree_new <- ggtree(eni_tree_prune, aes(color=TIA_NGENES, size=3), layout="circular", branch.length = "none", open.angle=10, size=0.1) %<+% fagorzi_new +
+  geom_tree(size=0.6) +
+  geom_tiplab(align=T,size=1.2, offset = 0.4,linetype = 0, fontface="bold.italic", fontface="bold") +
+  scale_color_manual(values=lifestyle[c(1,3)], na.value="lightgrey") +
+  theme(legend.title = element_blank(), 
+        legend.position="none",
+        plot.margin = unit(c(27,27,27,27), "mm")
+        )
+eni_tree_new
+
+
+```
+

@@ -1,0 +1,1059 @@
+## dN/dS calculation work flow 
+## Instructions from online tutorial: https://davidemms.github.io/orthofinder_tutorials/running-an-example-orthofinder-analysis.html
+## Citation for the program: Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. Genome Biology 20:238
+## Downloaded the program from github: https://github.com/davidemms/OrthoFinder
+
+## Download the translated CDS file of all the bacteria genomes from Genbank to get the protein files and untar the files 
+
+tar -xvf file_name.tar 
+gunzip file_name.tar 
+
+## Rename the file name to the name of the species 
+## Have all the species files in one folder called "protein" under the big folder "Test4" 
+
+## If there are multiple transcripts per gene we can select the longest transcript per gene in each file, this was pretty quick to run 
+## Put in a script using vi script_name, i, put in text, esc, :wq! then to run bash script_name 
+
+for f in *faa ; do python /ohta/tia.harrison/src/OrthoFinder/tools/primary_transcript.py $f ; done &
+
+## Run OrthoFinder on the new transcripts, OrthoFinder can only take amino acid sequences not nucleotides 
+## Might take a while so run in the background with nohup to get an output of the run (actually wasn't that long on 4 bacteria genomes)
+## Unclear if it requires a reference genome to use  
+
+nohup orthofinder -f primary_transcripts/ & 
+
+## Then logout and close 
+## Log back in and check that the program is running 
+
+ps -u tia.harrison
+
+## Read some summary stats from the nohup file - how many genes were assigned to how many orthogroups 
+## You want to see at least 80% of your genes assigned to orthogroups 
+## Check summary statistics per species to see if all species contributed about the same number of genes to orthologs 
+
+
+## Results with 30 species in orthofinder 
+## 170631 genes (93.8% of total) assigned to 14224 orthogroups
+## 810 orthogroups with all species present and 387 of those were single copy genes 
+
+
+
+## Some species might have several genes assigned to one ortholog where as some species have just one
+## The Orthogroups results folder will include both orthologs and paralogs so just use codes from Single Copy Orthologues result file 
+## Paralogs are genes that might have similar function but due to gene duplication not through a common ancestor (ortholog)
+## Extract the gene IDs for each species based on Single Copy Orthologues file 
+## This creates a file with the ortholog ID and then each row is the gene IDs for each species (check the Orthogroups.tsv file for the species names for each of the columns) 
+## Make sure to add  Orthogroup to the top of the Single Copy to maintain the header 
+
+grep -Fwf Orthogroups_SingleCopyOrthologues.txt Orthogroups.tsv > OrthologsIDS.txt
+
+## Remove the lcl| term at the beginning of the names in the headers 
+
+sed -i 's/lcl|//g' OrthologsIDS.txt
+
+## Replace the prot with cds so that the Ortholog list matches the fna files 
+
+sed -i 's/prot/cds/g' OrthologsIDS.txt
+
+
+## Download the CDS fasta files of each of the species from GenBank 
+## Using the ID codes, extract the genes from the CDS files to get the nucleotide code rather than back-translating or using amino acid sequences
+## Take the first column of the header in the fasta file to clean up the header IDs 
+
+
+
+## Test the code 
+awk '{print $1}' Cupriavidus_necator.fna > Cupriavidus_necator2.fna
+awk '{print $1}' Cupriavidus_oxalaticus.fna > Cupriavidus_oxalaticus2.fna
+awk '{print $1}' Methylobacterium_nodulans.fna > Methylobacterium_nodulans2.fna
+awk '{print $1}' Methylorubrum_extorquens.fna > Methylorubrum_extorquens2.fna
+
+
+## Put in a script and run on everything using bash 
+awk '{print $1}' Agrobacterium_vitis.fna > Agrobacterium_vitis2.fna
+awk '{print $1}' Azorhizobium_caulinodans.fna > Azorhizobium_caulinodans2.fna
+awk '{print $1}' Bradyrhizobium_betae.fna > Bradyrhizobium_betae2.fna
+awk '{print $1}' Bradyrhizobium_japonicum.fna > Bradyrhizobium_japonicum2.fna
+awk '{print $1}' Burkholderia_bannensis.fna > Burkholderia_bannensis2.fna
+awk '{print $1}' Burkholderia_cepacia.fna > Burkholderia_cepacia2.fna
+awk '{print $1}' Burkholderia_nodosa.fna > Burkholderia_nodosa2.fna
+awk '{print $1}' Burkholderia_seminalis.fna > Burkholderia_seminalis2.fna
+awk '{print $1}' Cupriavidus_necator.fna > Cupriavidus_necator2.fna
+awk '{print $1}' Cupriavidus_oxalaticus.fna > Cupriavidus_oxalaticus2.fna
+awk '{print $1}' Methylobacterium_extorquens.fna > Methylobacterium_extorquens2.fna
+awk '{print $1}' Methylobacterium_nodulans.fna > Methylobacterium_nodulans2.fna
+awk '{print $1}' Microvigra_flocculans.fna > Microvigra_flocculans2.fna
+awk '{print $1}' Microvigra_lupini.fna > Microvigra_lupini2.fna
+awk '{print $1}' Ochrobactrum_anthropi.fna > Ochrobactrum_anthropi2.fna
+awk '{print $1}' Ochrobactrum_lupini.fna > Ochrobactrum_lupini2.fna
+awk '{print $1}' Paraburkholderia_fungorum.fna > Paraburkholderia_fungorum2.fna
+awk '{print $1}' Paraburkholderia_graminis.fna > Paraburkholderia_graminis2.fna
+awk '{print $1}' Paraburkholderia_kirstenboschensis.fna > Paraburkholderia_kirstenboschensis2.fna
+awk '{print $1}' Paraburkholderia_ribeironis.fna > Paraburkholderia_ribeironis2.fna 
+awk '{print $1}' Pseudorhizobium_pelagicum.fna > Pseudorhizobium_pelagicum2.fna
+awk '{print $1}' Rhizobium_daejeonense.fna > Rhizobium_daejeonense2.fna
+awk '{print $1}' Rhizobium_leguminosarium.fna > Rhizobium_leguminosarium2.fna
+awk '{print $1}' Rhizobium_marinus.fna > Rhizobium_marinus2.fna
+awk '{print $1}' Rhizobium_rosettiformans.fna > Rhizobium_rosettiformans2.fna
+awk '{print $1}' Rhizobium_undicola.fna > Rhizobium_undicola2.fna
+awk '{print $1}' Rhizobium_vignae.fna > Rhizobium_vignae2.fna
+awk '{print $1}' Shinella_kummerowiae.fna > Shinella_kummerowiae2.fna
+awk '{print $1}' Shinella_zoogleoides.fna > Shinella_zoogleoides2.fna
+awk '{print $1}' Xanthobacter_autotrophicus.fna > Xanthobacter_autotrophicus2.fna 
+
+
+
+## Place the species name in the header of each sequence to keep track of species ID 
+## Test the code on a few samples 
+sed 's/>.*/&_Cupriavidus_oxalaticus/' Cupriavidus_oxalaticus2.fna > Cupriavidus_oxalaticus3.fna
+sed 's/>.*/&_Cupriavidus_necator/' Cupriavidus_necator2.fna > Cupriavidus_necator3.fna
+sed 's/>.*/&_Methylorubrum_extorquens/' Methylorubrum_extorquens2.fna > Methylorubrum_extorquens3.fna
+sed 's/>.*/&_Methylobacterium_nodulans/' Methylobacterium_nodulans2.fna > Methylobacterium_nodulans3.fna
+
+## Put all the code in a script and run 
+sed 's/>.*/&_Agrobacterium_vitis/' Agrobacterium_vitis2.fna > Agrobacterium_vitis3.fna
+sed 's/>.*/&_Azorhizobium_caulinodans/' Azorhizobium_caulinodans2.fna > Azorhizobium_caulinodans3.fna
+sed 's/>.*/&_Bradyrhizobium_betae/' Bradyrhizobium_betae2.fna > Bradyrhizobium_betae3.fna
+sed 's/>.*/&_Bradyrhizobium_japonicum/' Bradyrhizobium_japonicum2.fna > Bradyrhizobium_japonicum3.fna
+sed 's/>.*/&_Burkholderia_bannensis/' Burkholderia_bannensis2.fna > Burkholderia_bannensis3.fna
+sed 's/>.*/&_Burkholderia_cepacia/' Burkholderia_cepacia2.fna > Burkholderia_cepacia3.fna
+sed 's/>.*/&_Burkholderia_nodosa/' Burkholderia_nodosa2.fna > Burkholderia_nodosa3.fna
+sed 's/>.*/&_Burkholderia_seminalis/' Burkholderia_seminalis2.fna > Burkholderia_seminalis3.fna
+sed 's/>.*/&_Cupriavidus_necator/' Cupriavidus_necator2.fna > Cupriavidus_necator3.fna
+sed 's/>.*/&_Cupriavidus_oxalaticus/' Cupriavidus_oxalaticus2.fna > Cupriavidus_oxalaticus3.fna
+sed 's/>.*/&_Methylobacterium_extorquens/' Methylobacterium_extorquens2.fna > Methylobacterium_extorquens3.fna
+sed 's/>.*/&_Methylobacterium_nodulans/' Methylobacterium_nodulans2.fna > Methylobacterium_nodulans3.fna
+sed 's/>.*/&_Microvigra_flocculans/' Microvigra_flocculans2.fna > Microvigra_flocculans3.fna
+sed 's/>.*/&_Microvigra_lupini/' Microvigra_lupini2.fna > Microvigra_lupini3.fna
+sed 's/>.*/&_Ochrobactrum_anthropi/' Ochrobactrum_anthropi2.fna > Ochrobactrum_anthropi3.fna
+sed 's/>.*/&_Ochrobactrum_lupini/' Ochrobactrum_lupini2.fna > Ochrobactrum_lupini3.fna
+sed 's/>.*/&_Paraburkholderia_fungorum/' Paraburkholderia_fungorum2.fna > Paraburkholderia_fungorum3.fna
+sed 's/>.*/&_Paraburkholderia_graminis/' Paraburkholderia_graminis2.fna > Paraburkholderia_graminis3.fna
+sed 's/>.*/&_Paraburkholderia_kirstenboschensis/' Paraburkholderia_kirstenboschensis2.fna > Paraburkholderia_kirstenboschensis3.fna
+sed 's/>.*/&_Paraburkholderia_ribeironis/' Paraburkholderia_ribeironis2.fna > Paraburkholderia_ribeironis3.fna 
+sed 's/>.*/&_Pseudorhizobium_pelagicum/' Pseudorhizobium_pelagicum2.fna > Pseudorhizobium_pelagicum3.fna
+sed 's/>.*/&_Rhizobium_daejeonense/' Rhizobium_daejeonense2.fna > Rhizobium_daejeonense3.fna
+sed 's/>.*/&_Rhizobium_leguminosarium/' Rhizobium_leguminosarium2.fna > Rhizobium_leguminosarium3.fna
+sed 's/>.*/&_Rhizobium_marinus/' Rhizobium_marinus2.fna > Rhizobium_marinus3.fna
+sed 's/>.*/&_Rhizobium_rosettiformans/' Rhizobium_rosettiformans2.fna > Rhizobium_rosettiformans3.fna
+sed 's/>.*/&_Rhizobium_undicola/' Rhizobium_undicola2.fna > Rhizobium_undicola3.fna
+sed 's/>.*/&_Rhizobium_vignae/' Rhizobium_vignae2.fna > Rhizobium_vignae3.fna
+sed 's/>.*/&_Shinella_kummerowiae/' Shinella_kummerowiae2.fna > Shinella_kummerowiae3.fna
+sed 's/>.*/&_Shinella_zoogleoides/' Shinella_zoogleoides2.fna > Shinella_zoogleoides3.fna
+sed 's/>.*/&_Xanthobacter_autotrophicus/' Xanthobacter_autotrophicus2.fna > Xanthobacter_autotrophicus3.fna
+
+
+
+
+## Split up the big fasta file so that each sequence has its own file and is named after the sequence code name 
+## Make a directory for each species and put the files from each species in each directory 
+## Test it out on a few species 
+awk -F "|" '/^>/ {F = $2".fa"} {print > "C_oxalaticus/"F}' Cupriavidus_oxalaticus3.fna 
+awk -F "|" '/^>/ {F = $2".fa"} {print > "C_necator/"F}' Cupriavidus_necator3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "M_extorquens/"F}' Methylorubrum_extorquens3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "M_nodulans/"F}' Methylobacterium_nodulans3.fna
+
+
+## Do all the species in a script and run 
+
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Agrobacterium_vitis/"F}' Agrobacterium_vitis3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Azorhizobium_caulinodans/"F}' Azorhizobium_caulinodans3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Bradyrhizobium_betae/"F}' Bradyrhizobium_betae3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Bradyrhizobium_japonicum/"F}' Bradyrhizobium_japonicum3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Burkholderia_bannensis/"F}' Burkholderia_bannensis3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Burkholderia_cepacia/"F}' Burkholderia_cepacia3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Burkholderia_nodosa/"F}' Burkholderia_nodosa3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Burkholderia_seminalis/"F}' Burkholderia_seminalis3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Cupriavidus_necator/"F}' Cupriavidus_necator3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Cupriavidus_oxalaticus/"F}' Cupriavidus_oxalaticus3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Methylobacterium_extorquens/"F}' Methylobacterium_extorquens3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Methylobacterium_nodulans/"F}' Methylobacterium_nodulans3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Microvigra_flocculans/"F}' Microvigra_flocculans3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Microvigra_lupini/"F}' Microvigra_lupini3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Ochrobactrum_anthropi/"F}' Ochrobactrum_anthropi3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Ochrobactrum_lupini/"F}' Ochrobactrum_lupini3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Paraburkholderia_fungorum/"F}' Paraburkholderia_fungorum3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Paraburkholderia_graminis/"F}' Paraburkholderia_graminis3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Paraburkholderia_kirstenboschensis/"F}' Paraburkholderia_kirstenboschensis3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Paraburkholderia_ribeironis/"F}' Paraburkholderia_ribeironis3.fna 
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Pseudorhizobium_pelagicum/"F}' Pseudorhizobium_pelagicum3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_daejeonense/"F}' Rhizobium_daejeonense3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_leguminosarium/"F}' Rhizobium_leguminosarium3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_marinus/"F}' Rhizobium_marinus3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_rosettiformans/"F}' Rhizobium_rosettiformans3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_undicola/"F}' Rhizobium_undicola3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Rhizobium_vignae/"F}' Rhizobium_vignae3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Shinella_kummerowiae/"F}' Shinella_kummerowiae3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Shinella_zoogleoides/"F}' Shinella_zoogleoides3.fna
+awk -F "|" '/^>/ {F = $2".fa"} {print > "Xanthobacter_autotrophicus/"F}' Xanthobacter_autotrophicus3.fna
+
+
+## Combine all species orthologs based on the OrthoFinderIDs and name after Ortholog code ID 
+## Include the species ID in the code to call the right gene from the right species 
+## Save this in bash script called combineorthos and run by running $ nohup bash combineorthos &
+## Make sure you have the right order of the codes
+
+
+## Prep the file for the script on all the species 
+## Convert the Windows file format to a Unix file format 
+awk '{ sub("\r$", ""); print }' OrthologsIDS_test.txt > OrthologsIDS_unix.txt
+
+## Add a new line to the end of the file so it will work in the while loop 
+ed -s OrthologsIDS_unix.txt <<< w
+
+## Do the script on all the species called combine_genes5 
+while read a b c d e f g h i j k l m n o p q r s t u v w x y z ab ac ad ae af; do 
+	cat Agrobacterium_vitis/*"$b"*.fa Azorhizobium_caulinodans/*"$c"*.fa Bradyrhizobium_betae/*"$d"*.fa Bradyrhizobium_japonicum/*"$e"*.fa Burkholderia_bannensis/*"$f"*.fa Burkholderia_cepacia/*"$g"*.fa Burkholderia_nodosa/*"$h"*.fa Burkholderia_seminalis/*"$i"*.fa Cupriavidus_necator/*"$j"*.fa Cupriavidus_oxalaticus/*"$k"*.fa Methylobacterium_extorquens/*"$l"*.fa Methylobacterium_nodulans/*"$m"*.fa Microvigra_flocculans/*"$n"*.fa Microvigra_lupini/*"$o"*.fa Ochrobactrum_anthropi/*"$p"*.fa Ochrobactrum_lupini/*"$q"*.fa Paraburkholderia_fungorum/*"$r"*.fa Paraburkholderia_graminis/*"$s"*.fa Paraburkholderia_kirstenboschensis/*"$t"*.fa Paraburkholderia_ribeironis/*"$u"*.fa Pseudorhizobium_pelagicum/*"$v"*.fa Rhizobium_daejeonense/*"$w"*.fa Rhizobium_leguminosarium/*"$x"*.fa Rhizobium_marinus/*"$y"*.fa Rhizobium_rosettiformans/*"$z"*.fa Rhizobium_undicola/*"$ab"*.fa Rhizobium_vignae/*"$ac"*.fa Shinella_kummerowiae/*"$ad"*.fa Shinella_zoogleoides/*"$ae"*.fa Xanthobacter_autotrophicus/*"$af"*.fa > Alignment/"$a".fa
+done < OrthologsIDS_unix.txt
+
+
+## Count the number of > headers in each file, ones with four represent all four species 
+
+grep -c ">" *.fa > Fasta_count.txt 
+
+## Collect all lines with 30 sequences and output to new file to see how many worked 
+## They all worked so this line wasn't necessary 
+grep -e ":30" Fasta_count.txt > Fasta_count2.txt 
+
+
+## Alignment, see tutorial http://wasabiapp.org/software/prank/ 
+## Use prank aligner with the -codon function because it performs the best and performs a codon alignment (Markova-Raina 2011)
+## Put -F states that inference of insertions should be trusted so don't align insertions  
+
+## Test out on one file first 
+prank -d=OG0001609.fa -o=OG0001609 -codon -F 
+
+## Plug all genes through the script for alignment 
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+
+## Build maximum likelihood trees from the alignments for input into PAML 
+## Need to convert fas file to phylip file format 
+## Use script from this website to do the conversion https://github.com/josephhughes/Sequence-manipulation
+
+## Need to remove the lcl| in the gene name first before converting otherwise the name of the different genes and species gets messed up 
+## Test the code to remove the beginning on one file 
+sed -i 's/lcl|//g' OG0001609.best.fas 
+
+## Run the name removal on all the files 
+
+for f in *.best.fas
+do 
+	sed -i 's/lcl|//g' $f
+done 
+
+
+## Now perform the file conversion 
+## Test out on one file first and it outputs the same file with the .phy extension 
+
+Fasta2Phylip.pl OG0001476.best.fas 
+
+## Run the program on all gene alignments, use script called conversion_loop
+
+for f in *.best.fas 
+do 
+	Fasta2Phylip.pl $f 
+done 
+
+## Put all new files in a new folder for the tree building 
+## Make RAXML trees for each gene using the phy gene alignment files
+## Check the manual for parameters https://cme.h-its.org/exelixis/resource/download/NewManual.pdf 
+## -f a allows for rapid boostrapping 
+## the program is boostrapping 20 times 
+## p and x are seed numbers for the program to generate random numbers for bootstrapping
+## s is phylip input and n is the name for the output tree  
+## GTRCATX with X at the end means that it will be maximum likelihood and GTRGAMMA is a nucleotide model  
+
+## Test out on one gene file 
+raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s OG0001609.best.fas.phy -n OG0001609.tree 
+
+## Run on all file in a loop 
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+## Maybe try multithreading with raxmlHPC-PTHREADS-SSE3
+
+## Unclear which tree to use in PAML, the one with just bootstrap in the title is good for viewing in FigTree 
+## For PAML you might want to use branchlengths in the tree too 
+## Move the files into new folder called PAML for next steps 
+ 
+
+## Input the multiple alignment and the tree into PAML 
+## Decide on parameters using manual http://abacus.gene.ucl.ac.uk/software/pamlDOC.pdf
+## Fill out the codeml.ctl file with the specifications for your model (codeml.ctl should be in your directory with files)  
+## Use codeml to analyze protein coding DNA sequences, specify 1 to indicate DNA in seqtype in the control file codeml.ctl (not amino acid seq which would be 2) 
+## Can use phylip format for sequence alignment file into PAML, it is in sequential format which is the default (option S) 
+## Tree file should be in nex format 
+## No model for insertion or deletion so alignment gaps are treated as an ambiguity and removal of a nucleotide means removal of a whole codon 
+## Other Q&As about codeml http://abacus.gene.ucl.ac.uk/software/pamlFAQs.pdf
+
+## Rubin and Moreau did a test in PAML on all genes by implementing the following conditions
+## model=1 is the free-ratios model  (I think this is a w ratio for each branch - and then just take the ratios at the tip branches for the species), the manual says this is parameter rich and discouraged but this is the one I want 
+## They used the species tree as the input for tree but I think I will use the gene trees for each gene itself - or does that get away from the question? 
+## They put cleandata=1 to mask ambiguous data 
+## runmode=0 means it will use my tree (but then it does estimate multiple trees?) 
+## NSites= 0 means there is no variation in dn/ds among sites (we just want variation among lineages) 
+## CodonFreq=2 so that it estimates equilibrium codon freqs at three codon positions 
+## clock=0 no clock 
+
+## testing this out in codeml_lineage.ctl file 
+
+
+## Need tree with branch lengths for paml 
+## The RAxML_bestTree.OG0001609.tree has branch lengths and the analysis will only output one tree 
+## To run PAML with your control file 
+
+nohup codeml codeml_lineage2.ctl &
+
+## Run codeml_lineage2.ctl but on all ~300 genes 
+## Replace the current code with the new ortholog name 
+sed 's/OrthologName/OG0001/g' codeml_lineage3.ctl > test.ctl
+
+## Now do it for all the ortholog alignment files 
+## Make list of ortholog names 
+ls *.best.fas.phy > OrthologNamesFile 
+## Clean up the names and then move into the PAML folder 
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Run while loop on all names 
+## Put code in createcodeml script and run 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' codeml_lineage3.ctl > "$name".ctl
+done < OrthologNamesFile 
+
+## Put the codeml files in the same folder with trees and alignments then run for loop 
+## For loop is in script called PAML_run 
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+## This is testing out code on one file at a time 
+## Pull out all the relevant values from the output file 
+awk '/w ratios as labels for TreeView:/,EOF' OG0001571_lineage.results > OG0001571_tree
+# Replace the , with a new line 
+sed -i 's/,/\n/g' OG0001571_tree
+# Remove the ( ) 
+sed -i 's/(//g' OG0001571_tree
+sed -i 's/)//g' OG0001571_tree
+# Remove everything after the second # 
+sed -i 's/#[^#]*//2g' OG0001571_tree
+# Remove ; 
+sed -i 's/;//g' OG0001571_tree
+# Remove space at beginning of the lines 
+sed -i 's/ //g' OG0001571_tree
+# Replace the # with a tab
+sed -i 's/#/\t/g' OG0001571_tree
+# Delete the first and last line in the file 
+sed -i '1d;$d' OG0001571_tree
+# Delete the last two lines 
+sed -i '$d' OG0001571_tree
+sed -i '$d' OG0001571_tree
+
+
+# Add the gene name to the third column 
+awk '{print $0 "\tOG0001571"}' OG0001571_tree > temp_file && mv temp_file OG0001571_final_table
+# Check that there are 30 lines 
+wc -l OG0001571_final_table
+
+
+
+## Now automate the code to do all the files in the results file 
+# Make a list of the ortholog names 
+ls *lineage.results > Ortholog_names
+sed -i 's/_lineage.results//g' Ortholog_names
+
+# For loop for first step in file called script1 
+# OR put all of this in one file called grab_values and run everything together 
+for f in *lineage.results 
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree//g' $f
+done 
+
+# Cat together all the result files into one file 
+cat *_final_table > Rhizobia_PAML_results.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' Rhizobia_PAML_results.txt 
+
+# Take the final file and look at it in R 
+# In excel add column headers for Species, dn/ds values, and gene name 
+
+
+
+
+## Now do the same thing for just the dn and ds values 
+## test1 script  
+for f in *lineage.results 
+do 
+	sed -n '/dN tree:/{n;p;}' $f > ${f%%.*}_tree
+done 
+
+# For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	cut -f1,2 -d':' $f > ${f%%.*}_tree_NEW
+done 
+
+# Add the gene name to the last column 
+for f in *_tree_NEW
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree_tree_NEW//g' $f
+done 
+
+# Cat together all the result files into one file 
+cat *_tree_tree_NEW_final_table > Nodulation_PAML_dN_results.txt 
+
+# Add a tab between the dnds and gene name values and insert tab into the colon character 
+sed -i 's/ /\t/g' Nodulation_PAML_dN_results.txt 
+sed -i 's/:/\t/g' Nodulation_PAML_dN_results.txt 
+
+
+# Take the final file and look at it in R 
+# In excel add column headers for Species, dn/ds values, and gene name 
+# Also combine the dN and dS values into the dnds or w ratios 
+
+
+
+
+## To find the genes that are involved in symbiosis and their orthologs go to the fasta file 
+## Change the OrthologsIDS.txt to a single column file 
+
+xargs -n1 < OrthologsIDS.txt  > orthologs_forsearch 
+sed -i 's/,//g' orthologs_forsearch 
+
+## Remove first 31 lines in the file 
+sed -i -e '1,31d' orthologs_forsearch
+
+
+## Search the .fna files for anything in the big list of orthologs 
+## Now look in the orthoresults2 for the results 
+## Pull out just orthologs in the .fna files and save 
+
+for f in *.fna 
+do 
+	grep -Fw -f orthologs_forsearch $f > ${f%%.*}_orthos.fna
+done 
+
+## Now we have all the orthologs in the analysis and we can search that for nodulation genes 
+
+for f in *orthos.fna
+do
+	grep 'gene=nod\|gene=noe\|gene=nol\|gene=nop\|gene=nfe\|gene=nodul\|gene=nif\|gene=fix\|gene=fixation\|gene=nitrogenase\|protein=nod\|protein=noe\|protein=nol\|protein=nop\|protein=nfe\|protein=nodul\|protein=nif\|protein=fix\|protein=fixation\|protein=nitrogenase' $f > ${f%%.*}.symgenes
+done
+
+
+
+
+# What I need to do now is go back and find the genes that were not in every single species but in enough to still use those orthologs 
+
+
+
+
+
+## To find the genes that are involved in symbiosis and their orthologues go back to OrthoFinder folder 
+## In the faa files search each genome for these key words that indicate a symbiosis function with plants 
+## nod, noe, nol, nop, nfe, nodul, nif, fix, fixation, nitrogenase -- a la Epstein & Tiffin 2020  
+## These are searching gene names, what about the product descriptions? 
+## In the .fna files search these key names in the gene name and protein name 
+
+for f in *.faa
+do
+	grep 'gene=nod\|gene=noe\|gene=nol\|gene=nop\|gene=nfe\|gene=nodul\|gene=nif\|gene=fix\|gene=fixation\|gene=nitrogenase\|protein=nod\|protein=noe\|protein=nol\|protein=nop\|protein=nfe\|protein=nodul\|protein=nif\|protein=fix\|protein=fixation\|protein=nitrogenase' $f > ${f%%.*}.symgenes
+done
+
+## Combine genes per pair 
+
+
+## Then find the ortholog codes for each pair 
+## Actually might not need to do this 
+cat Agrobacterium_vitis.symgenes Rhizobium_undicola.symgenes > Avitis_Rundicola_genes
+cat Azorhizobium_caulinodans.symgenes Xanthobacter_autotrophicus.symgenes > Acaulinodans_Xautotrophicus_genes
+cat Bradyrhizobium_betae.symgenes Bradyrhizobium_japonicum.symgenes > Bbetae_Bjaponicum_genes
+cat Burkholderia_bannensis.symgenes Burkholderia_nodosa.symgenes > Bbannensis_Bnodosa_genes
+cat Burkholderia_cepacia.symgenes Burkholderia_seminalis.symgenes > Bcepacia_Bseminalis_genes
+cat Cupriavidus_necator.symgenes Cupriavidus_oxalaticus.symgenes > Cnecator_Coxalaticus_genes
+cat Methylobacterium_extorquens.symgenes Methylobacterium_nodulans.symgenes > Mextorquens_Mnodulans_genes
+cat Microvigra_flocculans.symgenes Microvigra_lupini.symgenes > Mflocculans_Mlupulini_genes
+cat Ochrobactrum_anthropi.symgenes Ochrobactrum_lupini.symgenes > Oanthropi_Oluplini_genes
+cat Paraburkholderia_fungorum.symgenes Paraburkholderia_kirstenboschensis.symgenes > Pfungorum_Pkirstenoschensis_genes 
+cat Paraburkholderia_ribeironis.symgenes Paraburkholderia_graminis.symgenes > Pribeironis_Pgraminis_genes 
+cat Pseudorhizobium_pelagicum.symgenes Rhizobium_leguminosarium.symgenes > Ppelagicum_leguminosarium_genes
+cat Rhizobium_daejeonense.symgenes Rhizobium_rosettiformans.symgenes > Rdaejeonense_Prosettiformans_genes
+cat Rhizobium_marinus.symgenes Rhizobium_vignae.symgenes > Rmarinus_Rvignae_genes 
+cat Shinella_kummerowiae.symgenes Shinella_zoogleoides.symgenes > Skummerowiae_Szooleoides_genes 
+
+
+## Cat all the codes together in one file 
+cat *.symgenes > symgenes_codes
+
+## Look up what the protein function is in the ortholog to the symbiotic gene in the non-rhizobia genome 
+## Match up the genome annotations with the OrthologsIDS.txt file now moved into the Results file under OrthoFinder 
+## Make another copy of the gene annotations and clean up the codes 
+## Copy just the first column to clean up the labels and remove the beginning of the code 
+
+awk '{print $1}' symgenes_codes > symgenes_ortho2
+sed -i 's/lcl|//g' symgenes_ortho2
+sed -i 's/>//g' symgenes_ortho2
+# sed -i 's/prot/cds/g' symgenes_ortho2
+# sed -i 's/cds/prot/g' symgenes_ortho2 # Don't need to do this step if you are getting from the prot files anyways 
+
+
+# Now find all the rhizobia ortho codes if the rhizobia gene code matches it  
+
+grep -Fw -f symgenes_ortho2 Orthogroups.tsv > test_NEW 
+
+# Take just the first column to find the right gene names 
+# These are the rhizobia ortholgos 
+
+awk '{print $1}' test_NEW > rhizobia_orthologs
+
+# Identify the orthologs to the rhizobia genes in the non-symbiotic legume species 
+# Merge all columns into one file and remove , 
+
+xargs -n1 < test_NEW  > orthologs_forsearch 
+sed -i 's/,//g' orthologs_forsearch 
+
+# Try making the list of genes a tsv file and see if that helps 
+for f in *.faa 
+do 
+	grep -Fw -f orthologs_forsearch $f > ${f%%.*}_rhizgenes
+done 
+
+
+
+## Then search the output files for each species to see which kinds of genes are orthologs of rhizobia
+## These are in the primary_transcripts file
+## This worked! Look in the primary_transcripts file for lists that end in _rhizogenes to see what the genes are 
+
+ 
+## This is the list of orthologs that belong to a rhizobia gene = rhizobia_orthologs 
+## Do PAML on just these codes in rhizobia_orthologs 
+## There are 25 orthologs that are associated with rhizobia genes 
+## Add Orthogroup to the header to grab everything 
+
+grep -Fw -f symgenes_ortho2 Orthogroups.tsv > rhizobia_ortho_NEW.txt 
+
+## Remove the lcl| term at the beginning of the names in the headers 
+sed -i 's/lcl|//g' rhizobia_ortho_NEW.txt
+
+## Replace the prot with cds so that the Ortholog list matches the fna files 
+sed -i 's/prot/cds/g' rhizobia_ortho_NEW.txt
+
+## All the species genes are already labelled and split apart 
+## Combine all species orthologs based on the OrthoFinderIDs and name after Ortholog code ID 
+## Include the species ID in the code to call the right gene from the right species 
+## Save this in bash script called combineorthos and run by running $ nohup bash combineorthos &
+## Make sure you have the right order of the codes
+
+
+## Prep the file for the script on all the species 
+## Convert the Windows file format to a Unix file format 
+awk '{ sub("\r$", ""); print }' rhizobia_ortho_NEW.txt > rhizobia_ortho_NEW_unix.txt
+
+## Add a new line to the end of the file so it will work in the while loop 
+ed -s rhizobia_ortho_NEW_unix.txt <<< w
+
+## The problem with this is that there could be multiple genes in a species for each orthogroup indicating duplications 
+## How many are single genes across them all? Orthogroups that have duplicates will have commas 
+
+awk '$0 !~ /,/' rhizobia_ortho_NEW_unix.txt > single_rhizobia
+# 14 single copy rhizobia genes to compare, they are not in all the species 
+
+## Fix up the single_rhizobia file 
+awk '{ sub("\r$", ""); print }' single_rhizobia > single_rhizobia_unix.txt
+ed -s single_rhizobia_unix.txt <<< w
+
+## Fill in the empty cells with characters to fill out dataframe 
+cp single_rhizobia_unix.txt test_original_file
+sed -i 's/\t\t/\tUNKNOWN\t/' test_original_file
+ed -s test_original_file <<< w
+
+
+## Do the script on all the species called combine_genes5 
+while read a b c d e f g h i j k l m n o p q r s t u v w x y z ab ac ad ae af; do 
+	cat Agrobacterium_vitis/*"$b"*.fa Azorhizobium_caulinodans/*"$c"*.fa Bradyrhizobium_betae/*"$d"*.fa Bradyrhizobium_japonicum/*"$e"*.fa Burkholderia_bannensis/*"$f"*.fa Burkholderia_cepacia/*"$g"*.fa Burkholderia_nodosa/*"$h"*.fa Burkholderia_seminalis/*"$i"*.fa Cupriavidus_necator/*"$j"*.fa Cupriavidus_oxalaticus/*"$k"*.fa Methylobacterium_extorquens/*"$l"*.fa Methylobacterium_nodulans/*"$m"*.fa Microvigra_flocculans/*"$n"*.fa Microvigra_lupini/*"$o"*.fa Ochrobactrum_anthropi/*"$p"*.fa Ochrobactrum_lupini/*"$q"*.fa Paraburkholderia_fungorum/*"$r"*.fa Paraburkholderia_graminis/*"$s"*.fa Paraburkholderia_kirstenboschensis/*"$t"*.fa Paraburkholderia_ribeironis/*"$u"*.fa Pseudorhizobium_pelagicum/*"$v"*.fa Rhizobium_daejeonense/*"$w"*.fa Rhizobium_leguminosarium/*"$x"*.fa Rhizobium_marinus/*"$y"*.fa Rhizobium_rosettiformans/*"$z"*.fa Rhizobium_undicola/*"$ab"*.fa Rhizobium_vignae/*"$ac"*.fa Shinella_kummerowiae/*"$ad"*.fa Shinella_zoogleoides/*"$ae"*.fa Xanthobacter_autotrophicus/*"$af"*.fa > Alignment_rhizobia2/"$a".fa
+done < test_original_file
+
+## Having trouble getting this while loop to work 
+## Instead since it is only 14 genes pick out the files yourself and cat them 
+## Look at the gene names in the excel sheet 
+## Do this in the fasta folder 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012172339.1_3913* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084824.1_7617* Burkholderia_bannensis/NZ_BAYA01000017.1_cds_WP_027818803.1_2858* Burkholderia_cepacia/NZ_CP045236.1_cds_WP_060061917.1_4591* Burkholderia_nodosa/NZ_JAFA01000055.1_cds_WP_051482046.1_6808* Burkholderia_seminalis/NZ_CP013400.1_cds_WP_049029994.1_4278* Methylobacterium_extorquens/NC_010172.1_cds_WP_012254859.1_3693* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930559.1_3915* Microvigra_flocculans/NZ_JAEA01000001.1_cds_WP_154664036.1_176* Microvigra_lupini/NZ_JACHWB010000002.1_cds_WP_183449551.1_1952* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_201703905.1_7170* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781171.1_5165* > Alignment_rhizobia/test.fa Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_064649245.1_2339* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487437.1_1701* > Alignment_rhizobia/OG0003334.fa 
+cat Bradyrhizobium_japonicum/NC_017249.1_cds_WP_014494825.1_4619* Burkholderia_bannensis/NZ_BAYA01000010.1_cds_WP_084162280.1_4340* Burkholderia_cepacia/NZ_CP045236.1_cds_WP_153489131.1_3507* Burkholderia_nodosa/NZ_JAFA01000009.1_cds_WP_028204371.1_8154* Burkholderia_seminalis/NZ_CP013400.1_cds_WP_059556850.1_5288* Cupriavidus_necator/NZ_CP039287.1_cds_WP_011615820.1_2776* Cupriavidus_oxalaticus/NZ_CP032519.1_cds_WP_151072304.1_4981* Methylobacterium_nodulans/NC_011894.1_cds_WP_015929962.1_3294* Paraburkholderia_fungorum/NZ_NBSN01000004.1_cds_WP_028194693.1_7042* Paraburkholderia_graminis/NZ_CP024935.1_cds_WP_114157129.1_4305* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000005.1_cds_WP_201702364.1_3060* Paraburkholderia_ribeironis/NZ_CYGX02000070.1_cds_WP_094782535.1_5094* Rhizobium_leguminosarium/NZ_SILH01000002.1_cds_WP_018245367.1_205* >  Alignment_rhizobia/OG0003547.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012169568.1_1063* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084555.1_7824* Burkholderia_nodosa/NZ_JAFA01000055.1_cds_WP_028208630.1_6818* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930529.1_3881* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598508.1_7158* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781179.1_5174* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_130660446.1_2354* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487427.1_1689* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400540.1_3201* >  Alignment_rhizobia/OG0004757.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012169569.1_1064* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084554.1_7825* Burkholderia_nodosa/NZ_JAFA01000055.1_cds_WP_051482048.1_6817* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930530.1_3882* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598507.1_7157* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781178.1_5173* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_032491851.1_2353* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_051558890.1_1690* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400541.1_3202* >Alignment_rhizobia/OG0004758.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012169570.1_1065* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084553.1_7826* Burkholderia_nodosa/NZ_JAFA01000069.1_cds_WP_028208877.1_7517* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930531.1_3883* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598505.1_7154* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781201.1_5201* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_032491850.1_2352* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487428.1_1691* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400542.1_3203* >Alignment_rhizobia/OG0004759.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012169571.1_1066* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084552.1_7827* Burkholderia_nodosa/NZ_JAFA01000069.1_cds_WP_028208878.1_7518* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930532.1_3884* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598504.1_7153* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781200.1_5200* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_032491849.1_2351* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487429.1_1692* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400543.1_3204* > Alignment_rhizobia/OG0004760.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012171935.1_3495* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084566.1_7813* Burkholderia_nodosa/NZ_JAFA01000063.1_cds_WP_035515519.1_7328* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930545.1_3898* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598662.1_7141* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781193.1_5193* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_032491863.1_2342* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_084268450.1_1719* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_011995787.1_3185* > Alignment_rhizobia/OG0004775.fa
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012171937.1_3497* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_041960893.1_7812* Burkholderia_nodosa/NZ_JAFA01000063.1_cds_WP_081772060.1_7332* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930540.1_3894* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598481.1_7132* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781191.1_5188* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_032491861.1_2344* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487454.1_1722* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400527.1_3183* > Alignment_rhizobia/OG0004776.fa 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012169567.1_1062* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084556.1_7823* Burkholderia_nodosa/NZ_JAFA01000055.1_cds_WP_028208631.1_6820* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930528.1_3880* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598509.1_7159* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781180.1_5175* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487426.1_1688* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_011995771.1_3200* > Alignment_rhizobia/OG0005101.fa 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_173362976.1_3530* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084580.1_7800* Burkholderia_nodosa/NZ_JAFA01000069.1_cds_WP_028208873.1_7512* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930550.1_3905* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_7126* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781189.1_5186* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487442.1_1705* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400493.1_3141* > Alignment_rhizobia/OG0005122.fa 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_043879623.1_3915* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084822.1_7619* Burkholderia_nodosa/NZ_JAFA01000055.1_cds_WP_028208619.1_6804* Methylobacterium_nodulans/NC_011894.1_cds_WP_015930557.1_3913* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_128598553.1_7112* Paraburkholderia_ribeironis/NZ_CYGX02000044.1_cds_WP_094781169.1_5161* Rhizobium_leguminosarium/NZ_SILH01000006.1_cds_WP_081295649.1_2337* Rhizobium_undicola/NZ_JHXQ01000006.1_cds_WP_027487439.1_1703* > Alignment_rhizobia/OG0005128.fa
+cat Bradyrhizobium_japonicum/NC_017249.1_cds_WP_171463834.1_7774* Burkholderia_seminalis/NZ_CP013400.1_cds_WP_049029126.1_5173* Paraburkholderia_fungorum/NZ_NBSN01000003.1_cds_WP_028200328.1_428* Paraburkholderia_graminis/NZ_CP024935.1_cds_WP_114157284.1_4608* Paraburkholderia_ribeironis/NZ_CYGX02000051.1_cds_WP_094781774.1_1912* > Alignment_rhizobia/OG0006898.fa 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_012171964.1_3525* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_011084576.1_7804* Paraburkholderia_kirstenboschensis/NZ_CAJHCR010000029.1_cds_WP_201703897.1_7148* Xanthobacter_autotrophicus/NZ_VAUP01000035.1_cds_WP_138400499.1_3148* >Alignment_rhizobia/OG0007477.fa
+
+## This one only has 2 species and I think PAML requires at least 4 samples to get good calculations 
+cat Azorhizobium_caulinodans/NC_009937.1_cds_WP_158304143.1_3908* Bradyrhizobium_japonicum/NC_017249.1_cds_WP_026312623.1_7610* > Alignment_rhizobia/OG0010307.fa 
+
+
+## Count the number of > headers in each file, how many species should be represented before moving forward with analysis? 30 species total 
+grep -c ">" *.fa > Fasta_count.txt 
+
+## Plug all rhizobia genes through the script for alignment 
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+## Continue on with the steps for tree building and codeml 
+## Now codeml is running on the 13 genes that are rhizobia N fixing/nodule making genes 
+
+
+
+
+
+
+## Look up the nod/nif genes per species and then search the codes in Orthologues folder and look at what are the orthologues in the related species 
+## Could look up one-to-one comparisons of orthologues in the species pair and then get the list
+## If the ortholog is in at least 50% of all pairs then it can be added to the comparison? Or what % should this be? 
+
+
+## Find all single copy orthologues that might not be in all species but at least 4 species 
+## There are 14225 orthologues in the Orthogroups.tsv file which should be everything, not just the single copy genes in all 30 species 
+## To find single copy remove all , 
+## Now the file has 8625 genes 
+
+awk '$0 !~ /,/' Orthogroups.tsv > single_all_orthos.txt
+
+## Remove the orthologs that were already done in the single copy (all 30 species) 
+## Remove the orthologs in the OrthologsIDS.txt because these have already been done 
+## Prepare the file fo codes to remove
+cut -f1 < OrthologsIDS.txt > codes_to_remove
+sed -i '1d' codes_to_remove
+grep -vf codes_to_remove single_all_orthos.txt > single_all_orthos_unique.txt 
+
+
+## Count the number of words per line 
+awk -F'[: \t]+' '{print NF}' single_all_orthos_unique7.txt > counts
+## Delete the last lines that have less than 4 species (which means 4 or less because the ortho code counts - need at least 5) 
+## There are still a lot of genes with 4 or more so maybe instead should bump it up a little - how many do we need? 
+
+## Count the number of lines greater than 4 
+awk '$1>4{c++} END{print c+0}' counts
+awk '$1>10{c++} END{print c+0}' counts
+
+
+## There are 4515 genes that are greater than 4 (at least 5 words meaning at least 4 species since the ortho name is one of the words)
+## Take these first 4515 lines that have at least 4 comparisons 
+head -4515 single_all_orthos_unique7.txt > single_all_orthos_four.txt
+## Check out the number of counts 
+awk -F'[: \t]+' '{print NF}' single_all_orthos_four.txt > counts_four
+
+## Clean up the file 
+sed -i 's/prot/cds/g' single_all_orthos_four.txt
+sed -i 's/lcl|//g' single_all_orthos_four.txt
+
+## Try filling in the empty fields 
+## Make a new file to test 
+cp single_all_orthos_four.txt single_all_orthos_four_NEW.txt
+## Run this 30 times because it will only fill in the first empty field it comes across in a column 
+sed -i 's/\t\t/\tUNKNOWN\t/' single_all_orthos_four_NEW.txt
+## This will fill in the unknowns up until the last column but that should be fine 
+
+awk '{ sub("\r$", ""); print }' single_all_orthos_four_NEW.txt > single_all_orthos_four_NEW_unix.txt
+ed -s single_all_orthos_four_NEW_unix.txt <<< w
+
+## Some of the genes are not being found could try this code instead 
+## After it encounters an empy field it stops - how to keep it going 
+while read a b c d e f g h i j k l m n o p q r s t u v w x y z ab ac ad ae af; do 
+	cat Agrobacterium_vitis/"$b"_Agrobacterium_vitis.fa Azorhizobium_caulinodans/"$c"_Azorhizobium_caulinodans.fa Bradyrhizobium_betae/"$d"_Bradyrhizobium_betae.fa Bradyrhizobium_japonicum/"$e"_Bradyrhizobium_japonicum.fa Burkholderia_bannensis/"$f"_Burkholderia_bannensis.fa Burkholderia_cepacia/"$g"_Burkholderia_cepacia.fa Burkholderia_nodosa/"$h"_Burkholderia_nodosa.fa Burkholderia_seminalis/"$i"_Burkholderia_seminalis.fa Cupriavidus_necator/"$j"_Cupriavidus_necator.fa Cupriavidus_oxalaticus/"$k"_Cupriavidus_oxalaticus.fa Methylobacterium_extorquens/"$l"_Methylobacterium_extorquens.fa Methylobacterium_nodulans/"$m"_Methylobacterium_nodulans.fa Microvigra_flocculans/"$n"_Microvigra_flocculans.fa Microvigra_lupini/"$o"_Microvigra_lupini.fa Ochrobactrum_anthropi/"$p"_Ochrobactrum_anthropi.fa Ochrobactrum_lupini/"$q"_Ochrobactrum_lupini.fa Paraburkholderia_fungorum/"$r"_Paraburkholderia_fungorum.fa Paraburkholderia_graminis/"$s"_Paraburkholderia_graminis.fa Paraburkholderia_kirstenboschensis/"$t"_Paraburkholderia_kirstenboschensis.fa Paraburkholderia_ribeironis/"$u"_Paraburkholderia_ribeironis.fa Pseudorhizobium_pelagicum/"$v"_Pseudorhizobium_pelagicum.fa Rhizobium_daejeonense/"$w"_Rhizobium_daejeonense.fa Rhizobium_leguminosarium/"$x"_Rhizobium_leguminosarium.fa Rhizobium_marinus/"$y"_Rhizobium_marinus.fa Rhizobium_rosettiformans/"$z"_Rhizobium_rosettiformans.fa Rhizobium_undicola/"$ab"_Rhizobium_undicola.fa Rhizobium_vignae/"$ac"_Rhizobium_vignae.fa Shinella_kummerowiae/"$ad"_Shinella_kummerowiae.fa Shinella_zoogleoides/"$ae"_Shinella_zoogleoides.fa Xanthobacter_autotrophicus/"$af"_Xanthobacter_autotrophicus.fa > Alignemnt_extra5/"$a".fa
+done < single_all_orthos_four_NEW_unix.txt
+
+## Count the number of genes in the directory by counting the number of files 
+ls | wc -l
+## There are 4516 genes! But some of these might have 4 samples but not between pairs! 
+
+
+## Count the number of > headers in each file, ones with four represent all four species 
+## This seemed to work! 
+grep -c ">" *.fa > Fasta_count.txt
+## Some of these have only 3 samples? 
+## Remove genes so that you only have those that are 10 samples or more 
+## First remove gene names 
+sed 's/.*://' Fasta_count.txt > counts.txt  
+awk '$1>10{c++} END{print c+0}' counts.txt
+## There are 794 genes that have at least 10 samples in them, lets go with this 
+head -794 Fasta_count.txt > Orthos_tokeep.txt
+sed -i 's/[:].*$//' Orthos_tokeep.txt
+
+## Now take the rest of the samples 
+sed -n -e '795,4515p' Fasta_count.txt > Orthos_tokeep_ALL.txt
+sed -i 's/[:].*$//' Orthos_tokeep_ALL.txt
+
+
+
+## Copy the orthos to keep into new directory 
+
+while read f
+do 
+	cp "$f" All_orthostokeep
+done< Orthos_tokeep_ALL.txt
+
+## Check that it worked, yep 794 genes!  
+ls | wc -l
+
+
+## Run the alignment on all the genes! 
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+
+
+## Get rid of comparisons with only 3 samples 
+
+sed -n -e '795,4515p' Fasta_count.txt > test_samples
+grep ':3' test_samples > test_samples2
+wc -l test_samples2 # 982 genes to delete 
+sed -i 's/[:].*$//' test_samples2
+sed -i 's/.fa//' test_samples2
+
+## Move the 3 pairs over to a different file called three_pairs
+
+while read f
+do 
+	mv "$f"* three_pairs
+done< test_samples2
+
+## Count files left in the folder 
+
+ls *fa | wc -l  # 2739 genes left 
+
+## This is in the Alignemnt_extra5/Orthos_to_keep folder 
+## Do the trees on all the alignments 
+
+## Run the name removal on all the files 
+
+for f in *.best.fas
+do 
+	sed -i 's/lcl|//g' $f
+done 
+
+## Run the conversion program on all gene alignments, use script called conversion_loop
+
+for f in *.best.fas 
+do 
+	Fasta2Phylip.pl $f 
+done 
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+
+## Make list of ortholog names 
+ls *.best.fas.phy > OrthologNamesFile 
+## Clean up the names and then move into the PAML folder 
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Run while loop on all names 
+## Put code in createcodeml script and run 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' codeml_lineage3.ctl > "$name".ctl
+done < OrthologNamesFile 
+
+## Put the codeml files in the same folder with trees and alignments then run for loop 
+## For loop is in script called PAML_run 
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+
+## Extract the results from all the lineage.results files for the genes 
+## Put all this in a script 
+
+ls *lineage.results > Ortholog_names
+sed -i 's/_lineage.results//g' Ortholog_names
+
+# For loop for first step in file called script1 
+# OR put all of this in one file called grab_values and run everything together 
+for f in *lineage.results 
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree//g' $f
+done 
+
+# Cat together all the result files into one file 
+cat *_final_table > All_orthos_w.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' All_orthos_w.txt 
+
+
+
+
+
+# Now do the same thing for dN and dS separately 
+for f in *lineage.results 
+do 
+	sed -n '/dS tree:/{n;p;}' $f > ${f%%.*}_tree
+done 
+
+# For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	cut -f1,2 -d':' $f > ${f%%.*}_tree_NEW
+done 
+
+# Add the gene name to the last column 
+for f in *_tree_NEW
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree_tree_NEW//g' $f
+done 
+
+# Cat together all the result files into one file 
+cat *_tree_tree_NEW_final_table > All_orthos_dS.txt
+
+# Add a tab between the dnds and gene name values and insert tab into the colon character 
+sed -i 's/ /\t/g' All_orthos_dS.txt 
+sed -i 's/:/\t/g' All_orthos_dS.txt 
+
+
+
+
+
+
+
+
+
+## Find the paralogs across all the species
+## All orthologs are in the file Orthogroups.tsv
+## Pull out all lines that have , because those have multiple genes per orthogroup 
+
+grep "," Orthogroups.tsv > paralogs 
+wc -l paralogs # 5600 rows!! How should I do this??? 
+
+## Re-order the lines from most words to fewest words 
+awk '{print NF,$0}' paralogs | sort -nr | cut -d' ' -f 2- > paralogs3
+
+
+## Count the number of words per line 
+awk -F'[: \t]+' '{print NF}' paralogs3 > paralog_counts
+wc -l paralog_counts
+## 5600 total paralogs  
+
+## Count the number of lines greater than 5 (need to put in 4 because the first column has a header that takes up a word ) 
+awk '$1>4{c++} END{print c+0}' paralog_counts 
+
+
+## There are 5060 genes that have at least 4 species
+## But they are not all in order of highest to lowest count 
+
+head -5060 paralogs > paralogs_four.txt
+
+## Check out the number of counts 
+awk -F'[: \t]+' '{print NF}' paralogs_four.txt > counts_paralog_four
+
+## Now it's good 
+## Clean up the file 
+sed -i 's/prot/cds/g' paralogs_four.txt
+sed -i 's/lcl|//g' paralogs_four.txt
+
+## Now how to extract the multiple codes per column? 
+## Go to the Orthogroups_Sequences file which already has all the files in fasta format just not with the species name in the sequence names BUT i can change that later!!!! 
+## Get just the first column with the ortholog names to extract 
+## NNNNOOOOOOPEEEE Cant do this because these are the protein files!!!! Need to do the dnds calling on the fasta nucleotide files!!! OMG!!! 
+## Ugh, how can I extract multiple codes per fold, grrrrrrrrrrrrrr
+## Or pool all the sequences in one folder and have it just grab the codes from that!! Haha! Get rid of the , and change them all to tabs and pool all the sequences together 
+
+
+## Copy all the individual sequences to one big file 
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Xanthobacter_autotrophicus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Shinella_zoogleoides/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Shinella_kummerowiae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_vignae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_undicola/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_rosettiformans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_marinus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_leguminosarium/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_daejeonense/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Pseudorhizobium_pelagicum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_ribeironis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_kirstenboschensis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_graminis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_fungorum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Ochrobactrum_lupini/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Ochrobactrum_anthropi/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Microvigra_lupini/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Microvigra_flocculans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Methylobacterium_nodulans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Methylobacterium_extorquens/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Cupriavidus_oxalaticus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Cupriavidus_necator/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_seminalis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_nodosa/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_cepacia/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_bannensis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Bradyrhizobium_japonicum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Bradyrhizobium_betae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Azorhizobium_caulinodans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
+cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Agrobacterium_vitis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ & 
+
+
+
+## Try filling in the empty fields 
+## Make a new file to test 
+cp paralogs_four.txt paralogs_four_test.txt
+
+## Take the file into excel and add a dummy column called test 
+
+## Replace , with tabs 
+sed -i 's/, /\t/g' paralogs_four_test_excel.txt
+
+
+## Count the number of columns 
+head -1 paralogs_four_test_excel.txt | tr '\t' '\n' | wc -l  # 1087 columns total!!! Holy moly!!! (-1 for the TEST column and -1 for gene name) 
+ 
+
+## Replace tabs with spaces 
+sed 's/\t/ /g' paralogs_four_test_excel.txt > paralogs_four_test_excel2.txt
+
+## Remove lines that are less than 4 words (there are two extra columns-gene and TEST)
+awk 'NF>=6' paralogs_four_test_excel2.txt > paralogs_four_test_excel3.txt
+
+## Make separate file for just the codes 
+awk -F" " '{print $1}' paralogs_four_test_excel3.txt > paralogs_four_test_CODES.txt
+
+## Remove the first column 
+awk '{$1=" "}1' paralogs_four_test_excel3.txt | awk '{$1=$1}1' > paralogs_four_test_excel4.txt
+## The new paralog file has spaces after this step (if it didn't already have them before) 
+
+## Insert * characters at the end of each entry in the file by replacing spaces with *
+sed -i 's/ /* /g' paralogs_four_test_excel4.txt
+
+## Remove test from the file 
+sed -i 's/TEST*//g' paralogs_four_test_excel4.txt
+sed -i 's/TEST//g' paralogs_four_test_excel4.txt
+
+
+## Now cat together all the lines in one file and give it a name using the codes in the second file 
+## AlignmentsC folder is working so check the excel_fasta2 file for the code that worked 
+while read -r lineA && IFS= read -r lineB <&3; do
+  ls $lineA | xargs cat >> AlignmentsC/"$lineB".fa
+done <paralogs_four_test_excel4.txt 3<paralogs_four_test_CODES.txt
+
+
+## Count how many sequences in each file by counting number of >
+for f in *.fa; do
+	grep -o '>' $f | wc -l >> character_counts
+done
+
+## Count how many sequences in each line in the paralog file by counting the *
+awk -F\* '{print NF-1}' paralogs_four_test_excel4.txt > paralog_counts2
+## Or count the number of words 
+awk '{print NF}' paralogs_four_C.txt > paralog_counts
+
+## Now everything matches up very nicely 
+
+## Prank alignments 
+## Made different folders with different sets of files to make it go faster and do a version of parallelism 
+for f in *.fa 
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+

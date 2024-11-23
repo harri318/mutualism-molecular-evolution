@@ -1,0 +1,3151 @@
+# Plant RNA Analysis 
+# Data is in MolecularProject/Whole_Sample
+
+
+# Known hosts thing 
+capsicum.eeb.utoronto.ca,142.150.215.145 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNpX8QUDt739q0Gky0Urrh2rQD/zogtV5HRrxW4Fq4rV6sEI/9emO8Qfs2TlMFjyz2uwu68MlbVWelZyjE9YQbQ=
+ohta.eeb.utoronto.ca,142.150.214.91 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKboSxAZZvfCc/8paRfgCw7dEgK0etfierD5ebKOH02z8HpHHlxIEWkwUBkZPZborbwHjHMo8rrp5Pzz+4BPjYU=
+niagara.computecanada.ca,142.150.188.70 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO8cD1IJIRuKUGC387wLAwGdsLsWMZI6IOLJRszEtxsx
+symbiont.eeb.utoronto.ca,142.150.214.44 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN4EOnvs50pHJI45CHvZP8Er1uLHsqud7uiAh3cDyeFUdzctaBcLPDLynd6r1ZiIeujOQl+c4Glb2BZkzDb5on0=
+grandiflora.eeb.utoronto.ca,142.150.214.250 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBP2hqgQXSDV2cu9aYNDUB8k7QliRTDzoVmhEKyi+BKUiYPxAe1URk1jenSa8p0HSMeRS68DWiUkS19HQeHJWhJs=
+ohta.eeb.utoronto.ca ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC4aQynF/PizecJzNbMuwF+oWLqnDne9RmSTwqvGxS8p
+symbiont.eeb.utoronto.ca ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKZ2ycHaV9NT5OtH+4wTJIoaRBVJsGRenBxtw9qjK3Nk
+
+
+
+# Check the quality of the sequences with fastqc in a new file called fastqc_files 
+# Need to run in the FastQC bin and set path to the files and directory 
+# Test one sample first 
+
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_297---NEBNext_dual_i5_345.SD2_1_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_297---NEBNext_dual_i5_345.SD2_1_R2.fastq.gz
+
+# Then run bash script with all samples 
+
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz
+
+# Pull the html files onto personal computer 
+# Check the html files of the fastqc output and determine what needs to be trimmed 
+# Per base sequence content at beginning of reads is biased but this might be okay because if it is from a Nextera kit it cuts at specific places and is real sequence 
+# Duplication levels are also biased but this is RNA so there might be expression differences across reads 
+# Adapters are present and need to be trimmed off 
+# Overall quality is really good across the whole read - doesn't get below 30 even at ends of quartile 
+
+# Run Trimmomatic 
+# Adapters from nanuq say it is NEBNext_dual adapters and looking at the adapter folder it matches the TruSeq3 adapter sequences 
+# I have paired end sequences R1 and R2 reads 
+# Test on one sample first 
+
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 
+NS.1689.004.NEBNext_dual_i7_297---NEBNext_dual_i5_345.SD2_1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_297---NEBNext_dual_i5_345.SD2_1_R2.fastq.gz 
+SD2_1_trimmed_paired_R1.fastq.gz 
+SD2_1_trimmed_unpaired_R1.fastq.gz 
+SD2_1_trimmed_paired_R2.fastq.gz 
+SD2_1_trimmed_unpaired_R2.fastq.gz 
+ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+
+# Then put the rest in a bash script and run 
+
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R2.fastq.gz SI2_1_trimmed_paired_R1.fastq.gz SI2_1_trimmed_unpaired_R1.fastq.gz SI2_1_trimmed_paired_R2.fastq.gz SI2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R2.fastq.gz DS2_trimmed_paired_R1.fastq.gz DS2_trimmed_unpaired_R1.fastq.gz DS2_trimmed_paired_R2.fastq.gz DS2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R2.fastq.gz PA1_2_trimmed_paired_R1.fastq.gz PA1_2_trimmed_unpaired_R1.fastq.gz PA1_2_trimmed_paired_R2.fastq.gz PA1_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R2.fastq.gz PD1_4_trimmed_paired_R1.fastq.gz PD1_4_trimmed_unpaired_R1.fastq.gz PD1_4_trimmed_paired_R2.fastq.gz PD1_4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R2.fastq.gz SO2_trimmed_paired_R1.fastq.gz SO2_trimmed_unpaired_R1.fastq.gz SO2_trimmed_paired_R2.fastq.gz SO2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R2.fastq.gz SB2_trimmed_paired_R1.fastq.gz SB2_trimmed_unpaired_R1.fastq.gz SB2_trimmed_paired_R2.fastq.gz SB2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R2.fastq.gz MA4_trimmed_paired_R1.fastq.gz MA4_trimmed_unpaired_R1.fastq.gz MA4_trimmed_paired_R2.fastq.gz MA4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R2.fastq.gz MG1_trimmed_paired_R1.fastq.gz MG1_trimmed_unpaired_R1.fastq.gz MG1_trimmed_paired_R2.fastq.gz MG1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R2.fastq.gz CH1_trimmed_paired_R1.fastq.gz CH1_trimmed_unpaired_R1.fastq.gz CH1_trimmed_paired_R2.fastq.gz CH1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R2.fastq.gz CE2_trimmed_paired_R1.fastq.gz CE2_trimmed_unpaired_R1.fastq.gz CE2_trimmed_paired_R2.fastq.gz CE2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz DA2_trimmed_paired_R1.fastq.gz DA2_trimmed_unpaired_R1.fastq.gz DA2_trimmed_paired_R2.fastq.gz DA2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz DA2_2_trimmed_paired_R1.fastq.gz DA2_2_trimmed_unpaired_R1.fastq.gz DA2_2_trimmed_paired_R2.fastq.gz DA2_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE.fa:2:30:10
+
+
+# Re-run fastqc on the paired sequences 
+
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SD2_1_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SD2_1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SI2_1_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SI2_1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DS2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DS2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/PA1_2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/PA1_2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/PD1_4_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/PD1_4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SO2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SO2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SB2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/SB2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/MA4_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/MA4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/MG1_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/MG1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/CH1_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/CH1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/CE2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/CE2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DA2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DA2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/fastqc_trim_files /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DA2_2_trimmed_paired_R1.fastq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/DA2_2_trimmed_paired_R1.fastq.gz
+
+# Removing the adapters improved the per base sequence content at the beginning of the reads 
+# Duplication but this could be fine given it is RNA 
+# At the beginning of reads the per base sequence is biased but could be because of the kit used to prep library 
+# DA2_2 and DA2 has overrepresented sequences but no hits on what they are so maybe they are real? 
+# DS2 has bias in per base sequence at the beginning of the reads only in R1
+# PA1_2 has overrepresented sequence - TruSeq Adapter Index 5?? So is there another adapter we should trim? 
+# SB2 has overrepresented sequence - TruSeq Adapter Index 23 
+# SD2_1 has overrepresented sequence - TruSeq Adapter Index 14 
+# SI2_1 has overrepresented sequence - TruSeq Adapter Index 3 
+
+# Feel like we need to try trimming the adapters again and maybe choose a different one 
+
+
+# Could try trim_galore because it can find the proper adapter for you if you don't have the sequence to provide it with 
+# Check that these are installed first 
+
+cutadapt --version
+fastqc -v
+
+# Make sure to install cutadapt and then trimgalore 
+# trim_galore is now installed on ohta and niagara 
+# Try trimming the default Illumina adapters 
+# This is also doing a cutoff '-q 20' trim - but my sequences were way above this so I don't think this will be necessary or won't actually have an effect 
+
+trim_galore --phred33 --fastqc --illumina --paired --output_dir Trimgalore_test1 NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz
+
+# fastqc will run fastqc on the resulting trimmed files 
+# sequences are paired 
+# specify the directory to put the output 
+# illumina is the adapter to be trimmed - maybe double check this elsewhere
+# phred33 is default I think but also accurate for these sequences 
+
+
+# See how the trim went - it didn't really run fastqc after like I thought it would 
+
+fastqc -k 7 -o /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/Trimgalore_test1 /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/Trimgalore_test1/NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1_trimmed.fq.gz /ohta/tia.harrison/MolecularProject/Plant_pairs/Whole_sample/Trimgalore_test1/NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2_trimmed.fq.gz
+
+# Ok trimgalore did not help with the issue - should go back to trimmomatic and do the other adapter option 
+
+
+# Try these trimming options in trimmomatic 
+
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_298---NEBNext_dual_i5_346.SI2_1_R2.fastq.gz SI2_1_trimmed_paired_R1.fastq.gz SI2_1_trimmed_unpaired_R1.fastq.gz SI2_1_trimmed_paired_R2.fastq.gz SI2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_300---NEBNext_dual_i5_348.DS2_R2.fastq.gz DS2_trimmed_paired_R1.fastq.gz DS2_trimmed_unpaired_R1.fastq.gz DS2_trimmed_paired_R2.fastq.gz DS2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_301---NEBNext_dual_i5_349.PA1_2_R2.fastq.gz PA1_2_trimmed_paired_R1.fastq.gz PA1_2_trimmed_unpaired_R1.fastq.gz PA1_2_trimmed_paired_R2.fastq.gz PA1_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_302---NEBNext_dual_i5_350.PD1_4_R2.fastq.gz PD1_4_trimmed_paired_R1.fastq.gz PD1_4_trimmed_unpaired_R1.fastq.gz PD1_4_trimmed_paired_R2.fastq.gz PD1_4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_303---NEBNext_dual_i5_351.SO2_R2.fastq.gz SO2_trimmed_paired_R1.fastq.gz SO2_trimmed_unpaired_R1.fastq.gz SO2_trimmed_paired_R2.fastq.gz SO2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_304---NEBNext_dual_i5_352.SB2_R2.fastq.gz SB2_trimmed_paired_R1.fastq.gz SB2_trimmed_unpaired_R1.fastq.gz SB2_trimmed_paired_R2.fastq.gz SB2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_305---NEBNext_dual_i5_353.MA4_R2.fastq.gz MA4_trimmed_paired_R1.fastq.gz MA4_trimmed_unpaired_R1.fastq.gz MA4_trimmed_paired_R2.fastq.gz MA4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_306---NEBNext_dual_i5_354.MG1_R2.fastq.gz MG1_trimmed_paired_R1.fastq.gz MG1_trimmed_unpaired_R1.fastq.gz MG1_trimmed_paired_R2.fastq.gz MG1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_307---NEBNext_dual_i5_355.CH1_R2.fastq.gz CH1_trimmed_paired_R1.fastq.gz CH1_trimmed_unpaired_R1.fastq.gz CH1_trimmed_paired_R2.fastq.gz CH1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R1.fastq.gz NS.1689.004.NEBNext_dual_i7_308---NEBNext_dual_i5_356.CE2_R2.fastq.gz CE2_trimmed_paired_R1.fastq.gz CE2_trimmed_unpaired_R1.fastq.gz CE2_trimmed_paired_R2.fastq.gz CE2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz NS.1709.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz DA2_trimmed_paired_R1.fastq.gz DA2_trimmed_unpaired_R1.fastq.gz DA2_trimmed_paired_R2.fastq.gz DA2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+java -jar /ohta/tia.harrison/src/Trimmomatic-0.39/trimmomatic-0.39.jar PE -phred33 NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R1.fastq.gz NS.1714.001.NEBNext_dual_i7_180---NEBNext_dual_i5_180.DA2_R2.fastq.gz DA2_2_trimmed_paired_R1.fastq.gz DA2_2_trimmed_unpaired_R1.fastq.gz DA2_2_trimmed_paired_R2.fastq.gz DA2_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/ohta/tia.harrison/src/Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa:2:30:10
+
+
+# Try re-running the trim in niagara so it goes faster and try to get rid of low quality bases at the beginning and ends of reads
+# Also only keeping reads that have at least 30 bases 
+# Check this site for quality scores https://drive5.com/usearch/manual/quality_score.html
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=24:00:00
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+
+trimmomatic PE raw_sequences/SD2_1_R1.fastq.gz raw_sequences/SD2_1_R2.fastq.gz raw_sequences/SD2_1_trimmed_paired_R1.fastq.gz raw_sequences/SD2_1_trimmed_unpaired_R1.fastq.gz raw_sequences/SD2_1_trimmed_paired_R2.fastq.gz raw_sequences/SD2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/CE2_R1.fastq.gz raw_sequences/CE2_R2.fastq.gz raw_sequences/CE2_trimmed_paired_R1.fastq.gz raw_sequences/CE2_trimmed_unpaired_R1.fastq.gz raw_sequences/CE2_trimmed_paired_R2.fastq.gz raw_sequences/CE2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/CH1_R1.fastq.gz raw_sequences/CH1_R2.fastq.gz raw_sequences/CH1_trimmed_paired_R1.fastq.gz raw_sequences/CH1_trimmed_unpaired_R1.fastq.gz raw_sequences/CH1_trimmed_paired_R2.fastq.gz raw_sequences/CH1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DA2_2_R1.fastq.gz raw_sequences/DA2_2_R2.fastq.gz raw_sequences/DA2_2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_2_trimmed_unpaired_R1.fastq.gz raw_sequences/DA2_2_trimmed_paired_R2.fastq.gz raw_sequences/DA2_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DA2_R1.fastq.gz raw_sequences/DA2_R2.fastq.gz raw_sequences/DA2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_trimmed_unpaired_R1.fastq.gz raw_sequences/DA2_trimmed_paired_R2.fastq.gz raw_sequences/DA2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DS2_R1.fastq.gz raw_sequences/DS2_R2.fastq.gz raw_sequences/DS2_trimmed_paired_R1.fastq.gz raw_sequences/DS2_trimmed_unpaired_R1.fastq.gz raw_sequences/DS2_trimmed_paired_R2.fastq.gz raw_sequences/DS2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/MA4_R1.fastq.gz raw_sequences/MA4_R2.fastq.gz raw_sequences/MA4_trimmed_paired_R1.fastq.gz raw_sequences/MA4_trimmed_unpaired_R1.fastq.gz raw_sequences/MA4_trimmed_paired_R2.fastq.gz raw_sequences/MA4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/MG1_R1.fastq.gz raw_sequences/MG1_R2.fastq.gz raw_sequences/MG1_trimmed_paired_R1.fastq.gz raw_sequences/MG1_trimmed_unpaired_R1.fastq.gz raw_sequences/MG1_trimmed_paired_R2.fastq.gz raw_sequences/MG1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/PA1_2_R1.fastq.gz raw_sequences/PA1_2_R2.fastq.gz raw_sequences/PA1_2_trimmed_paired_R1.fastq.gz raw_sequences/PA1_2_trimmed_unpaired_R1.fastq.gz raw_sequences/PA1_2_trimmed_paired_R2.fastq.gz raw_sequences/PA1_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/PD1_4_R1.fastq.gz raw_sequences/PD1_4_R2.fastq.gz raw_sequences/PD1_4_trimmed_paired_R1.fastq.gz raw_sequences/PD1_4_trimmed_unpaired_R1.fastq.gz raw_sequences/PD1_4_trimmed_paired_R2.fastq.gz raw_sequences/PD1_4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SB2_R1.fastq.gz raw_sequences/SB2_R2.fastq.gz raw_sequences/SB2_trimmed_paired_R1.fastq.gz raw_sequences/SB2_trimmed_unpaired_R1.fastq.gz raw_sequences/SB2_trimmed_paired_R2.fastq.gz raw_sequences/SB2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SI2_1_R1.fastq.gz raw_sequences/SI2_1_R2.fastq.gz raw_sequences/SI2_1_trimmed_paired_R1.fastq.gz raw_sequences/SI2_1_trimmed_unpaired_R1.fastq.gz raw_sequences/SI2_1_trimmed_paired_R2.fastq.gz raw_sequences/SI2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SO2_R1.fastq.gz raw_sequences/SO2_R2.fastq.gz raw_sequences/SO2_trimmed_paired_R1.fastq.gz raw_sequences/SO2_trimmed_unpaired_R1.fastq.gz raw_sequences/SO2_trimmed_paired_R2.fastq.gz raw_sequences/SO2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+
+
+# Double check that the file sizes seem right and the slurm file to see if it finished 
+
+ls -sh *paired* 
+less -S slurm-6859667.out
+
+# Completed successfully! Yay! 
+# Then run fastqc in niagara to double check the quality after trimming 
+
+# When done, then run fastqc on all the trimmed files to check the quality 
+# Script for job submission for fastqc fastqc_trim_job1.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=10:00:00
+#SBATCH --job-name fastqc_trim
+#SBATCH --output=fastqc_trim_output_%j.txt
+
+module load java
+module load fastqc
+
+fastqc -k 7 -o fastqc_trim raw_sequences/SD2_1_trimmed_paired_R1.fastq.gz raw_sequences/SD2_1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/CE2_trimmed_paired_R1.fastq.gz raw_sequences/CE2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/CH1_trimmed_paired_R1.fastq.gz raw_sequences/CH1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/DA2_2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/DA2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/DS2_trimmed_paired_R1.fastq.gz raw_sequences/DS2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/MA4_trimmed_paired_R1.fastq.gz raw_sequences/MA4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/MG1_trimmed_paired_R1.fastq.gz raw_sequences/MG1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/PA1_2_trimmed_paired_R1.fastq.gz raw_sequences/PA1_2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/PD1_4_trimmed_paired_R1.fastq.gz raw_sequences/PD1_4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/SB2_trimmed_paired_R1.fastq.gz raw_sequences/SB2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/SI2_1_trimmed_paired_R1.fastq.gz raw_sequences/SI2_1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trim raw_sequences/SO2_trimmed_paired_R1.fastq.gz raw_sequences/SO2_trimmed_paired_R2.fastq.gz
+
+
+# Submit the job to niagara 
+
+sbatch fastqc_trim_job1.sh
+
+# Check the submission 
+
+squeue -u harri318
+
+# Then check the fastqc output to see how well the trimming worked 
+# Make sure to bring the files back over to ohta to save and move the job scripts and output to the home directory on niagara 
+
+# Ok the trimming did not work very well so need to bring over the exact adapter sequence and specify the path to it to make sure trimmommatic can find it 
+# Try the other PE truseq3 adapters 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trimm2
+#SBATCH --output=trimm2_output_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+trimmomatic PE raw_sequences/SD2_1_R1.fastq.gz raw_sequences/SD2_1_R2.fastq.gz raw_sequences/SD2_1_trimmed_paired_R1.fastq.gz raw_sequences/SD2_1_trimmed_unpaired_R1.fastq.gz raw_sequences/SD2_1_trimmed_paired_R2.fastq.gz raw_sequences/SD2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10 
+trimmomatic PE raw_sequences/CE2_R1.fastq.gz raw_sequences/CE2_R2.fastq.gz raw_sequences/CE2_trimmed_paired_R1.fastq.gz raw_sequences/CE2_trimmed_unpaired_R1.fastq.gz raw_sequences/CE2_trimmed_paired_R2.fastq.gz raw_sequences/CE2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/CH1_R1.fastq.gz raw_sequences/CH1_R2.fastq.gz raw_sequences/CH1_trimmed_paired_R1.fastq.gz raw_sequences/CH1_trimmed_unpaired_R1.fastq.gz raw_sequences/CH1_trimmed_paired_R2.fastq.gz raw_sequences/CH1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/DA2_2_R1.fastq.gz raw_sequences/DA2_2_R2.fastq.gz raw_sequences/DA2_2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_2_trimmed_unpaired_R1.fastq.gz raw_sequences/DA2_2_trimmed_paired_R2.fastq.gz raw_sequences/DA2_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/DA2_R1.fastq.gz raw_sequences/DA2_R2.fastq.gz raw_sequences/DA2_trimmed_paired_R1.fastq.gz raw_sequences/DA2_trimmed_unpaired_R1.fastq.gz raw_sequences/DA2_trimmed_paired_R2.fastq.gz raw_sequences/DA2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/DS2_R1.fastq.gz raw_sequences/DS2_R2.fastq.gz raw_sequences/DS2_trimmed_paired_R1.fastq.gz raw_sequences/DS2_trimmed_unpaired_R1.fastq.gz raw_sequences/DS2_trimmed_paired_R2.fastq.gz raw_sequences/DS2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/MA4_R1.fastq.gz raw_sequences/MA4_R2.fastq.gz raw_sequences/MA4_trimmed_paired_R1.fastq.gz raw_sequences/MA4_trimmed_unpaired_R1.fastq.gz raw_sequences/MA4_trimmed_paired_R2.fastq.gz raw_sequences/MA4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/MG1_R1.fastq.gz raw_sequences/MG1_R2.fastq.gz raw_sequences/MG1_trimmed_paired_R1.fastq.gz raw_sequences/MG1_trimmed_unpaired_R1.fastq.gz raw_sequences/MG1_trimmed_paired_R2.fastq.gz raw_sequences/MG1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/PA1_2_R1.fastq.gz raw_sequences/PA1_2_R2.fastq.gz raw_sequences/PA1_2_trimmed_paired_R1.fastq.gz raw_sequences/PA1_2_trimmed_unpaired_R1.fastq.gz raw_sequences/PA1_2_trimmed_paired_R2.fastq.gz raw_sequences/PA1_2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/PD1_4_R1.fastq.gz raw_sequences/PD1_4_R2.fastq.gz raw_sequences/PD1_4_trimmed_paired_R1.fastq.gz raw_sequences/PD1_4_trimmed_unpaired_R1.fastq.gz raw_sequences/PD1_4_trimmed_paired_R2.fastq.gz raw_sequences/PD1_4_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/SB2_R1.fastq.gz raw_sequences/SB2_R2.fastq.gz raw_sequences/SB2_trimmed_paired_R1.fastq.gz raw_sequences/SB2_trimmed_unpaired_R1.fastq.gz raw_sequences/SB2_trimmed_paired_R2.fastq.gz raw_sequences/SB2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/SI2_1_R1.fastq.gz raw_sequences/SI2_1_R2.fastq.gz raw_sequences/SI2_1_trimmed_paired_R1.fastq.gz raw_sequences/SI2_1_trimmed_unpaired_R1.fastq.gz raw_sequences/SI2_1_trimmed_paired_R2.fastq.gz raw_sequences/SI2_1_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+trimmomatic PE raw_sequences/SO2_R1.fastq.gz raw_sequences/SO2_R2.fastq.gz raw_sequences/SO2_trimmed_paired_R1.fastq.gz raw_sequences/SO2_trimmed_unpaired_R1.fastq.gz raw_sequences/SO2_trimmed_paired_R2.fastq.gz raw_sequences/SO2_trimmed_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE.fa:2:30:10
+
+
+# Try these primers TruSeq3-PE.fa:2:30:10
+# CHeck quality 
+
+fastqc -k 7 -o fastqc_trimm3 CE2_trimmed_paired_R1.fastq.gz CE2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 CH1_trimmed_paired_R1.fastq.gz CH1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 DA2_2_trimmed_paired_R1.fastq.gz DA2_2_trimmed_paired_R2.fastq.gz  
+fastqc -k 7 -o fastqc_trimm3 DA2_trimmed_paired_R1.fastq.gz DA2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 DS2_trimmed_paired_R1.fastq.gz DS2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 MA4_trimmed_paired_R1.fastq.gz MA4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 MG1_trimmed_paired_R1.fastq.gz MG1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 PA1_2_trimmed_paired_R1.fastq.gz PA1_2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 PD1_4_trimmed_paired_R1.fastq.gz PD1_4_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 SB2_trimmed_paired_R1.fastq.gz SB2_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 SD2_1_trimmed_paired_R1.fastq.gz SD2_1_trimmed_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm3 SI2_1_trimmed_paired_R1.fastq.gz SI2_1_trimmed_paired_R2.fastq.g
+fastqc -k 7 -o fastqc_trimm3 SO2_trimmed_paired_R1.fastq.gz SO2_trimmed_paired_R2.fastq.gz
+
+
+# After picking the proper adapter to trimm also include the quality trimms at the ends of reads and min read length 
+# trimm4_job.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trimm4
+#SBATCH --output=trimm4_output_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+trimmomatic PE raw_sequences/SD2_1_R1.fastq.gz raw_sequences/SD2_1_R2.fastq.gz raw_sequences/trimm4/SD2_1_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/SD2_1_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/SD2_1_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/SD2_1_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/CE2_R1.fastq.gz raw_sequences/CE2_R2.fastq.gz raw_sequences/trimm4/CE2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/CE2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/CE2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/CE2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/CH1_R1.fastq.gz raw_sequences/CH1_R2.fastq.gz raw_sequences/trimm4/CH1_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/CH1_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/CH1_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/CH1_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DA2_2_R1.fastq.gz raw_sequences/DA2_2_R2.fastq.gz raw_sequences/trimm4/DA2_2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/DA2_2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/DA2_2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/DA2_2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DA2_R1.fastq.gz raw_sequences/DA2_R2.fastq.gz raw_sequences/trimm4/DA2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/DA2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/DA2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/DA2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/DS2_R1.fastq.gz raw_sequences/DS2_R2.fastq.gz raw_sequences/trimm4/DS2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/DS2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/DS2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/DS2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+
+# Split up because last time did not finish in 24 hours 
+# trimm4.5_job.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trimm4.5
+#SBATCH --output=trimm4.5_output_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+trimmomatic PE raw_sequences/MA4_R1.fastq.gz raw_sequences/MA4_R2.fastq.gz raw_sequences/trimm4/MA4_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/MA4_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/MA4_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/MA4_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/MG1_R1.fastq.gz raw_sequences/MG1_R2.fastq.gz raw_sequences/trimm4/MG1_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/MG1_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/MG1_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/MG1_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/PA1_2_R1.fastq.gz raw_sequences/PA1_2_R2.fastq.gz raw_sequences/trimm4/PA1_2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/PA1_2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/PA1_2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/PA1_2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/PD1_4_R1.fastq.gz raw_sequences/PD1_4_R2.fastq.gz raw_sequences/trimm4/PD1_4_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/PD1_4_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/PD1_4_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/PD1_4_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SB2_R1.fastq.gz raw_sequences/SB2_R2.fastq.gz raw_sequences/trimm4/SB2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/SB2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/SB2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/SB2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SI2_1_R1.fastq.gz raw_sequences/SI2_1_R2.fastq.gz raw_sequences/trimm4/SI2_1_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/SI2_1_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/SI2_1_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/SI2_1_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+trimmomatic PE raw_sequences/SO2_R1.fastq.gz raw_sequences/SO2_R2.fastq.gz raw_sequences/trimm4/SO2_trimmed4_paired_R1.fastq.gz raw_sequences/trimm4/SO2_trimmed4_unpaired_R1.fastq.gz raw_sequences/trimm4/SO2_trimmed4_paired_R2.fastq.gz raw_sequences/trimm4/SO2_trimmed4_unpaired_R2.fastq.gz ILLUMINACLIP:/scratch/f/freder19/harri318/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 MINLEN:30
+
+
+# Now check quality on these final trimmed sequences with the best parameters 
+
+
+fastqc -k 7 -o fastqc_trimm4 CE2_trimmed4_paired_R1.fastq.gz CE2_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 CH1_trimmed4_paired_R1.fastq.gz CH1_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 DA2_2_trimmed4_paired_R1.fastq.gz DA2_2_trimmed4_paired_R2.fastq.gz  
+fastqc -k 7 -o fastqc_trimm4 DA2_trimmed4_paired_R1.fastq.gz DA2_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 DS2_trimmed4_paired_R1.fastq.gz DS2_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 MA4_trimmed4_paired_R1.fastq.gz MA4_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 MG1_trimmed4_paired_R1.fastq.gz MG1_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 PA1_2_trimmed4_paired_R1.fastq.gz PA1_2_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 PD1_4_trimmed4_paired_R1.fastq.gz PD1_4_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 SB2_trimmed4_paired_R1.fastq.gz SB2_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 SD2_1_trimmed4_paired_R1.fastq.gz SD2_1_trimmed4_paired_R2.fastq.gz
+fastqc -k 7 -o fastqc_trimm4 SI2_1_trimmed4_paired_R1.fastq.gz SI2_1_trimmed4_paired_R2.fastq.g
+fastqc -k 7 -o fastqc_trimm4 SO2_trimmed4_paired_R1.fastq.gz SO2_trimmed4_paired_R2.fastq.gz
+
+
+# Let's continue with trimm 4 reads
+# These are ones that removed adapters, did a leading and trailing trim, and sequence length minimum (30 bases) 
+
+
+
+# Okay going to move forward with the trimm4 sequences 
+# Do a de novo assembly on each genome in scratch on these sequences using spades 
+# job script called SI2_1_assembly.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name SI2_1_assembl
+#SBATCH --output=SI2_1_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 SI2_1_trimmed4_paired_R1.fastq.gz -2 SI2_1_trimmed4_paired_R2.fastq.gz -o Spades_output
+
+
+# Run assembly on each genome 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name CH1_assembl
+#SBATCH --output=CH1_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 CH1_trimmed4_paired_R1.fastq.gz -2 CH1_trimmed4_paired_R2.fastq.gz -o Spades_output_CH1
+
+
+
+
+
+______
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name CE2_assembl
+#SBATCH --output=CE2_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 CE2_trimmed4_paired_R1.fastq.gz -2 CE2_trimmed4_paired_R2.fastq.gz -o Spades_output_CE2
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name DS2_assembl
+#SBATCH --output=DS2_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 DS2_trimmed4_paired_R1.fastq.gz -2 DS2_trimmed4_paired_R2.fastq.gz -o Spades_output_DS2
+
+# MA4_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name MA4_assembl
+#SBATCH --output=MA4_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 MA4_trimmed4_paired_R1.fastq.gz -2 MA4_trimmed4_paired_R2.fastq.gz -o Spades_output_MA4
+
+# Cat the two da2 samples 
+# may need to gunzip first 
+
+cat DA2_2_trimmed4_paired_R1.fastq DA2_trimmed4_paired_R1.fastq > DA2_NEW_paired_R1.fastq
+cat DA2_2_trimmed4_paired_R2.fastq DA2_trimmed4_paired_R2.fastq > DA2_NEW_paired_R2.fastq
+
+# Then gzip them back up for the next step 
+
+# DA2_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name DA2_assembl
+#SBATCH --output=DA2_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 DA2_NEW_paired_R1.fastq -2 DA2_NEW_paired_R2.fastq -o Spades_output_DA2
+
+
+
+
+# MG1_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name MG1_assembl
+#SBATCH --output=MG1_assembl_%j.txt
+
+spades.py --threads 80 --rna -1 MG1_trimmed4_paired_R1.fastq.gz -2 MG1_trimmed4_paired_R2.fastq.gz -o Spades_output_MG1
+
+
+#CE2_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name CE2_assembl
+#SBATCH --output=CE2_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 CE2_trimmed4_paired_R1.fastq.gz -2 CE2_trimmed4_paired_R2.fastq.gz -o Spades_output_CE2
+
+
+#SO2_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name SO2_assembl
+#SBATCH --output=SO2_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 SO2_trimmed4_paired_R1.fastq.gz -2 SO2_trimmed4_paired_R2.fastq.gz -o Spades_output_SO2
+
+
+#PA1_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name PA1_assembl
+#SBATCH --output=PA1_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 PA1_2_trimmed4_paired_R1.fastq.gz -2 PA1_2_trimmed4_paired_R2.fastq.gz -o Spades_output_PA1
+
+
+#PD1_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name PD1_assembl
+#SBATCH --output=PD1_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 PD1_4_trimmed4_paired_R1.fastq.gz -2 PD1_4_trimmed4_paired_R2.fastq.gz -o Spades_output_PD1
+
+#SB2_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name SB2_assembl
+#SBATCH --output=SB2_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 SB2_trimmed4_paired_R1.fastq.gz -2 SB2_trimmed4_paired_R2.fastq.gz -o Spades_output_SB2
+
+
+#SD2_assembl.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name SD2_assembl
+#SBATCH --output=SD2_assembl_%j.txt
+
+#Avengers assemble! 
+spades.py --threads 80 --rna -1 SD2_1_trimmed4_paired_R1.fastq.gz -2 SD2_1_trimmed4_paired_R2.fastq.gz -o Spades_output_SD2
+
+
+
+
+# Spades will output transcripts.fasta and hard and soft 
+# Hard filtered are long transcripts rather than high expression 
+# Soft filtered includes short and low expressed (likely junk) 
+# Check number of contigs in the main transcript 
+
+grep -c "^>" transcripts.fasta
+
+# Total of 113450 contigs 
+
+# Since there is likely some redundancy in the transcripts you will want to filter in order to get just the longest transcript to represent that similarity of sequence 
+# Use the program CD-HIT to get rid of transcript redundancy 
+# Copy the transcripts over the the assemblies folder and rename according to the sample name 
+# Also need the R1 and R2 files over in the new file 
+# Run the redundancy code 
+# This program can be installed using conda 
+
+cd-hit-est -i SI2_1_transcripts.fasta -o SI2_I_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i CH1_transcripts.fasta -o CH1_transcriptsCollapsed.fasta -c 0.98 -n 8
+
+# Check assembly quality with rnaQUEST 
+# Need to self install this one 
+wget https://github.com/ablab/rnaquast/releases/download/v2.2.1/rnaQUAST-2.2.1.tar.gz
+
+# Get the collapsed assembly and the forward and reverse trimmed sequences into one folder in linux
+# Make a new folder for results 
+
+mkdir rnaQUAST_results_SI2_I
+
+# Run rnaQUAST 
+
+rnaQUAST.py -c SI2_I_transcriptsCollapsed.fasta -1 SI2_1_trimmed4_paired_R1.fastq.gz -2 SI2_1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SI2_I
+
+python rnaQUAST.py --test
+
+
+# To-do 
+# Finish assembly on all samples --> May not need the full 24 hours! 
+# Copy them over into their own new folder and rename 
+# Copy all job scripts over to the home directory so they are savec CHECK 
+# Copy all job outputs over to home SOME CHECK 
+# run the cd-hit to get just the longest ones 
+# Copy everything over to ohta so I have it saved somewhere 
+# Figure out rnaQUAST!!!!! 
+
+
+
+# These are all the samples we have 
+CE2   
+CH1  done cd hit 
+DA2  
+DS2  
+MA4   
+PA1   
+PD1  
+SB2  
+SD2  
+SI2_I  done cd hit 
+SO2  
+MG1
+
+# How to copy everything over 
+
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/DA2_NEW_paired_R2.fastq    /scratch/f/freder19/harri318/assemblies/DA2/
+
+
+
+# Maybe make job to run cd-hit on all the files one after the other? Shouldn't take too long but could do it on server just in case and to make fast 
+
+
+# filter_redundancy.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name filter_redundancy
+#SBATCH --output=filter_redundancy_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+cd-hit-est -i SD2/SD2_transcripts.fasta -o SD2/SD2_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i SB2/SB2_transcripts.fasta -o SB2/SB2_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i PD1/PD1_transcripts.fasta -o PD1/PD1_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i PA1/PA1_transcripts.fasta -o PA1/PA1_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i MG1/MG1_transcripts.fasta -o MG1/MG1_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i MA4/MA4_transcripts.fasta -o MA4/MA4_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i DS2/DS2_transcripts.fasta -o DS2/DS2_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i CE2/CE2_transcripts.fasta -o CE2/CE2_transcriptsCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i DA2/DA2_transcripts.fasta -o DA2/DA2_transcriptsCollapsed.fasta -c 0.98 -n 8
+
+# Now to try rnaQUAST for assessing the quality of the assemblies
+# This was super quick! No need for submitting a job  
+
+rnaQUAST.py -c SI2_I_transcriptsCollapsed.fasta -1 SI2_1_trimmed4_paired_R1.fastq.gz -2 SI2_1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SI2_I
+
+# Interpret the output 
+# In short report check how many transcripts are total and above 500 bp and 1000bp 
+# in basic metrics get average transcript length and N50 
+# The N50 is the length of the longest contig such that at 50% of all contigs are at least this length 
+# Another way to think about it = which is defined by the length of the shortest contig for which longer and equal length contigs cover at least 50 % of the assembly.
+# Higher N50s are better adn repetitive genoems and low quality will bring it down 
+# But basically it tells you if you are getting better assembly of more of the genome 
+# make sure to go back and record the transcript stats too! 
+
+
+# Now run rnaQUAST on all the assemblies 
+# This was super fast so don't need to submit job for it 
+# Make sure to load python environment first! 
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+rnaQUAST.py -c CE2_transcriptsCollapsed.fasta -1 CE2_trimmed4_paired_R1.fastq.gz -2 CE2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_CE2
+rnaQUAST.py -c CH1_transcriptsCollapsed.fasta -1 CH1_trimmed4_paired_R1.fastq.gz -2 CH1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_CH1
+rnaQUAST.py -c DA2_transcriptsCollapsed.fasta -1 DA2_NEW_paired_R1.fastq.gz -2 DA2_NEW_paired_R2.fastq.gz -o rnaQUAST_results_DA2
+rnaQUAST.py -c DS2_transcriptsCollapsed.fasta -1 DS2_trimmed4_paired_R1.fastq.gz -2 DS2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_DS2
+rnaQUAST.py -c MA4_transcriptsCollapsed.fasta -1 MA4_trimmed4_paired_R1.fastq.gz -2 MA4_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_MA4
+rnaQUAST.py -c PA1_transcriptsCollapsed.fasta -1 PA1_2_trimmed4_paired_R1.fastq.gz -2 PA1_2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_PA1
+rnaQUAST.py -c SB2_transcriptsCollapsed.fasta -1 SB2_trimmed4_paired_R1.fastq.gz -2 SB2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SB2
+rnaQUAST.py -c PD1_transcriptsCollapsed.fasta -1 PD1_4_trimmed4_paired_R1.fastq.gz -2 PD1_4_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_PD1
+rnaQUAST.py -c SD2_transcriptsCollapsed.fasta -1 SD2_1_trimmed4_paired_R1.fastq.gz -2 SD2_1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SD2
+rnaQUAST.py -c SO2_transcriptsCollapsed.fasta -1 SO2_trimmed4_paired_R1.fastq.gz -2 SO2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SO2
+rnaQUAST.py -c MG1_transcriptsCollapsed.fasta -1 MG1_trimmed4_paired_R1.fastq.gz -2 MG1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_MG1
+
+# Copy over the assembly folder over to ohta because it has the assemblies! 
+# Use the -r to copy over all folders and their contents too! 
+
+scp -r /scratch/f/freder19/harri318/assemblies/* tia.harrison@ohta.eeb.utoronto.ca:/ohta/tia.harrison/MolecularProject/Plant_pairs/Niagara_seq/assemblies
+
+# Maybe consider what BUSCO does in terms of assembly quality checks? 
+# Indicate transcriptome under m 
+# Put the assembly in -i 
+# -l is the lineage dataset or the dataset you want to compare to, you can ask it to do auto selection for the lineage
+# Do I know of any legume datasets that it could compare to? Surely Medicago truncatula has a transcriptome it could search against? 
+# A different paper used busco on the embryophyta lineage for pea genome (Kreplak paper) 
+# Lets see what it auto finds for us to use 
+# Output is the folder for the results 
+# Busco might actually take some time because it is running blastn and i'm asking it to auto select the lineage ...
+# Ok definitely put in a job 
+# Hmmm but when put in a job the connection broke??? 
+# Maybe just go with embryophyta then? -l embryophyta_odb10.2019-11-20
+
+# busco_CE2_embr.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name busco_CE2_embr3
+#SBATCH --output=busco_CE2_embr3_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i CE2_transcriptsCollapsed.fasta -o CE2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+
+busco -m transcriptome -f -i CE2_transcriptsCollapsed.fasta -o CE2_busco --auto-lineage-euk
+
+# Use -f to overwright old run 
+# busco keeps failing when trying to do a job the connection seems to break???? 
+
+
+# While that is going maybe read Maria's pipeline and other papers to see what's next in my protocol
+# According to the Holzer and Marz 2019 paper Trinity and Spades perform similarly for plant genomes although Spades could be slightly higher for A. thaliana 
+# Although further reading shows resutls of Selected BUSCOs (benchmarked universal single-copy orthologs 
+# I think I will want single copy orthologs for my orthofinder and spades did a better job at getting complete single copy orthologs than trinity in arabidopsis thaliana -- but maybe not so much better that I should just automatically go with spades 
+# I feel like Im gonna have to run both spades and trinity and compare N50, contig no, and busco scores 
+# This also makes me think I should run busco on my transcriptomes 
+
+# Will still go ahead with identifying the coding reagions in my assembly
+# Might help identify symbiotic genes later 
+# Install TransDecoder in Scratch and in conda environment 
+
+# Installation of Trinity in conda 
+
+conda install -c bioconda trinity # install 
+conda list -e # check installation 
+trinity # check that it runs 
+
+# LOL! Trinity is already a module!!! 
+# Try the module and load the dependencies 
+
+module load gcc/8.3.0 # load dependency 
+module load trinityrnaseq # load trinity 
+Trinity # Check that it runs 
+
+
+# Other notes https://biohpc.cornell.edu/lab/doc/trinity_workshop_part1.pdf
+# Running the assembler on your reads 
+# 1GB of RAM per 1 million reads
+# 1 hour per 1 million reads 
+
+
+# Avengers assemble! 
+# Use 40 cpus because we usually do 40 cpus per task 
+# --bflyCalculateCPU this will save 10G for butterfly 
+
+# trinity_CE2_NEW.sh 
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_CE2_NEW
+#SBATCH --output=trinity_CE2_NEW_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+Trinity --seqType fq --normalize_reads --left CE2_trimmed4_paired_R1.fastq.gz --right CE2_trimmed4_paired_R2.fastq.gz --max_memory 50G --CPU 35 --output trinity_test_CE
+
+
+# Memory issue 
+# Each node has 188 GiB / 202 GB RAM and there are 40 cores 
+# You want to multiply 40 by 
+
+# ImportError: No module named numpy
+# Try loading conda environment first for trinity 
+# Need to self install samtools so that it is 1.3 
+# Or specify in the modeul that it is samtools/1.9 !!! 
+
+
+
+# Try busco with it finding the best lineage 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name busco_CH1_busco
+#SBATCH --output=busco_CH1_busco_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i CH1_transcriptsCollapsed.fasta -o CH1_busco --auto-lineage-euk --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+# Even after the auto detection it chose eukaryota_odb10 as the lineage to use so that is the one we will go with 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name busco_DA2_embr
+#SBATCH --output=busco_DA2_embr_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i DA2_transcriptsCollapsed.fasta -o DA2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name busco_SO2_embr
+#SBATCH --output=busco_SO2_embr_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i SO2_transcriptsCollapsed.fasta -o SO2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name busco_SI2_NEW
+#SBATCH --output=busco_SI2_NEW_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i SI2_I_transcriptsCollapsed.fasta -o SI2_NEW_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+
+# Run one last busco on the spades genomes - check 
+# copy all the busco stuff over to ohta - check 
+# then work out the trinity problem with the memory and maybe try running offline so it doesn't check the certificate 
+
+
+# trinity_CE2_mem.sh 
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_CE2_mem
+#SBATCH --output=trinity_CE2_mem_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left CE2_trimmed4_paired_R1.fastq.gz --right CE2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_CE
+
+# CPU*bflyHeapSpaceMax 
+
+# For trinity need to have samtools on condo 
+conda install -c bioconda samtools=1.9 
+
+
+
+# I think this one worked for trinity 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_CE2_mem
+#SBATCH --output=trinity_CE2_mem_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left CE2_trimmed4_paired_R1.fastq.gz --right CE2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_CE
+
+
+
+# Now do the other reads 
+# CH1_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_CH1
+#SBATCH --output=trinity_CH1_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left CH1_trimmed4_paired_R1.fastq.gz --right CH1_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_CH1
+
+
+
+# DA2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_DA2
+#SBATCH --output=trinity_DA2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left DA2_2_trimmed4_paired_R1.fastq --right DA2_2_trimmed4_paired_R2.fastq --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_DA2
+
+
+# DS2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_DS2
+#SBATCH --output=trinity_DS2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left DS2_trimmed4_paired_R1.fastq.gz --right DS2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_DS2
+
+
+
+
+# MA4_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_MA4
+#SBATCH --output=trinity_MA4_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left MA4_trimmed4_paired_R1.fastq.gz --right MA4_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_MA4
+
+
+
+# MG1_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_MG1
+#SBATCH --output=trinity_MG1_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left MG1_trimmed4_paired_R1.fastq.gz --right MG1_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_MG1
+
+
+
+# PA1_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_PA1
+#SBATCH --output=trinity_PA1_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left PA1_2_trimmed4_paired_R1.fastq.gz --right PA1_2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_PA1
+
+
+
+# PD1_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_PD1
+#SBATCH --output=trinity_PD1_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left PD1_4_trimmed4_paired_R1.fastq.gz --right PD1_4_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_PD1
+
+
+# SB2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_SB2
+#SBATCH --output=trinity_SB2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left SB2_trimmed4_paired_R1.fastq.gz --right SB2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_SB2
+
+
+
+# SD2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_SD2
+#SBATCH --output=trinity_SD2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left SD2_1_trimmed4_paired_R1.fastq.gz --right SD2_1_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_SD2
+
+
+
+# SI2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_SI2
+#SBATCH --output=trinity_SI2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left SI2_1_trimmed4_paired_R1.fastq.gz --right SI2_1_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_SI2
+
+
+
+# SO2_trinity.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=24:00:00
+#SBATCH --job-name trinity_SO2
+#SBATCH --output=trinity_SO2_%j.txt
+
+# Load ALLLL the modules 
+module load gcc/8.3.0 
+module load trinityrnaseq 
+module load jellyfish
+module load samtools/1.9
+module load bowtie2
+module load boost/1.70.0
+module load tbb/2019u8
+module load salmon/0.14.2
+module load java/1.8
+
+# Load python environment 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Avengers assemble!  
+# Memory parameters for medium memory 
+Trinity --seqType fq --left SO2_trimmed4_paired_R1.fastq.gz --right SO2_trimmed4_paired_R2.fastq.gz --max_memory 100G --CPU 20 --bflyCPU 20 --bflyHeapSpaceMax 4G --output trinity_test_SO2
+
+
+# Now all the samples are running with trinity 
+# Next run rnaquest and busco on trinity assemblies and compare the spades output to trinity 
+# Which one is better? Use that for future analysis 
+
+# The assembled transcript at the end is just called Trinity.fasta so will need to relabel according to the species name or sample name 
+
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_CE/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/CE_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_CH1/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/CH1_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_DA2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/DA2_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_DS2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/DS2_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_MA4/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/MA4_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_MG1/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/MG1_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_PA1/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/PA1_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_PD1/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/PD1_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_SB2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/SB2_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_SD2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/SD2_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_SI2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/SI2_trinity.fasta
+cp -r /scratch/f/freder19/harri318/raw_sequences/trimm4/trinity_test_SO2/Trinity.fasta /scratch/f/freder19/harri318/trinity_assemblies/SO2_trinity.fasta
+
+# Check the number of contigs in all the assemblies 
+
+grep -c "^>" SI2_trinity.fasta 
+
+# Get rid of the redundancy in the contigs 
+# Run all of these in a job script
+# filter_redundancy.sh 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=10:00:00
+#SBATCH --job-name filter_redundancy
+#SBATCH --output=filter_redundancy_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+cd-hit-est -i CE_trinity.fasta -o CE_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i CH1_trinity.fasta -o CH1_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i DA2_trinity.fasta -o DA2_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i DS2_trinity.fasta -o DS2_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i MA4_trinity.fasta -o MA4_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i MG1_trinity.fasta -o MG1_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i PA1_trinity.fasta -o PA1_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i PD1_trinity.fasta -o PD1_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i SB2_trinity.fasta -o SB2_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i SD2_trinity.fasta -o SD2_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i SI2_trinity.fasta -o SI2_trinityCollapsed.fasta -c 0.98 -n 8
+cd-hit-est -i SO2_trinity.fasta -o SO2_trinityCollapsed.fasta -c 0.98 -n 8
+
+
+cd-hit-est -i DS2_trinity.fasta -o DS2_trinityCollapsed.fasta -c 0.98 -n 8
+
+
+# Run rnaquast 
+# No need for script because it was super fast!! Yay! 
+
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+/scratch/f/freder19/harri318/trinity_assemblies/
+
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/CE_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/CE2/CE2_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/CE2/CE2_trimmed4_paired_R2.fastq.gz -o /scratch/f/freder19/harri318/trinity_assemblies/rnaQUAST_results_CE_trinity
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/CH1_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/CH1/CH1_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/CH1/CH1_trimmed4_paired_R2.fastq.gz -o /scratch/f/freder19/harri318/trinity_assemblies/rnaQUAST_results_CH1_trinity
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/DA2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/DA2/DA2_NEW_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/DA2/DA2_NEW_paired_R2.fastq.gz -o rnaQUAST_results_DA2_trinity
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/DS2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/DS2/DS2_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/DS2/DS2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_DS2_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/MA4_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/MA4/MA4_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/MA4/MA4_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_MA4_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/PA1_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/PA1/PA1_2_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/PA1/PA1_2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_PA1_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/SB2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/SB2/SB2_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/SB2/SB2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SB2_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/PD1_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/PD1/PD1_4_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/PD1/PD1_4_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_PD1_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/SD2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/SD2/SD2_1_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/SD2/SD2_1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SD2_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/SO2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/SO2/SO2_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/SO2/SO2_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SO2_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/MG1_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/MG1/MG1_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/MG1/MG1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_MG1_trinity 
+rnaQUAST.py -c /scratch/f/freder19/harri318/trinity_assemblies/SI2_trinityCollapsed.fasta -1 /scratch/f/freder19/harri318/assemblies/SI2_I/SI2_1_trimmed4_paired_R1.fastq.gz -2 /scratch/f/freder19/harri318/assemblies/SI2_I/SI2_1_trimmed4_paired_R2.fastq.gz -o rnaQUAST_results_SI2_trinity 
+
+
+# Now run busco on the trinity collapsed assemblies 
+# Busco round 1 - try to put half of the transcripts in this job - will it be enough time? I dunno, we will see 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name busco_trinity2
+#SBATCH --output=busco_trinity2_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+busco --offline -m transcriptome -f -i CE_trinityCollapsed.fasta -o CE2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i CH1_trinityCollapsed.fasta -o CH1_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i DA2_trinityCollapsed.fasta -o DA2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i DS2_trinityCollapsed.fasta -o DS2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i MA4_trinityCollapsed.fasta -o MA4_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i MG1_trinityCollapsed.fasta -o MG1_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+busco --offline -m transcriptome -f -i PA1_trinityCollapsed.fasta -o PA1_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i PD1_trinityCollapsed.fasta -o PD1_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i SB2_trinityCollapsed.fasta -o SB2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i SD2_trinityCollapsed.fasta -o SD2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i SI2_trinityCollapsed.fasta -o SI2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+busco --offline -m transcriptome -f -i SO2_trinityCollapsed.fasta -o SO2_busco -l embryophyta_odb10 --download_path /scratch/f/freder19/harri318/assemblies/CE2/busco_downloads/
+
+
+# Check which assembly is better and then go on from there to the orthologs!!! Can't wait :) 
+# Ok spades is the winner with fewer but longer contigs!! 
+
+# Should we do transcoder first? I guess it will tell us which parts are the coding regions? I think this would be mostly comparing to the orthologs later? 
+# This step can actually be done later to identify which ones are coding so for now we can move onto finding orthologs 
+
+module load orthofinder/2.3.3
+
+# however this is an older version - should I try to install with conda the newer version? 
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+# Change the names of the files to the species names 
+
+# Now updated to OrthoFinder version 2.5.4 
+# Run the primary_transcripts.py to reduce redundancy - how to find this script? 
+# This was very fast - could it be because I already took out redundant reads previously??? 
+
+# Run once 
+python /home/f/freder19/harri318/bin/OrthoFinder/tools/primary_transcript.py Calliandra_eriophylla.fasta
+
+# Run through all of them - didn't reduce anything so no isoforms of the same gene but just in case we did this step anyways 
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+for f in *fasta ; do python /home/f/freder19/harri318/bin/OrthoFinder/tools/primary_transcript.py $f ; done 
+
+# Need to put the species names in the headers of all the gene IDs before running orthofinder 
+# Replace the carrot and NODE text with the species name 
+
+sed -i 's/>/>Senna_occidentalis_/g' Senna_occidentalis.fasta
+sed -i 's/>/>Calliandra_eriophylla_/g' Calliandra_eriophylla.fasta
+sed -i 's/>/>Calliandra_humilis_/g' Calliandra_humilis.fasta
+sed -i 's/>/>Dalea_mollis_/g' Dalea_mollis.fasta
+sed -i 's/>/>Dalea_mollissima_/g' Dalea_mollissima.fasta
+sed -i 's/>/>Mimosa_aculeaticarpa_/g' Mimosa_aculeaticarpa.fasta
+sed -i 's/>/>Mimosa_grahamii_/g' Mimosa_grahamii.fasta
+sed -i 's/>/>Peltophorum_africanum_/g' Peltophorum_africanum.fasta
+sed -i 's/>/>Peltophorum_dubium_/g' Peltophorum_dubium.fasta
+sed -i 's/>/>Senna_barclayana_/g' Senna_barclayana.fasta
+sed -i 's/>/>Senna_didymobotrya_/g' Senna_didymobotrya.fasta
+sed -i 's/>/>Senna_italica_/g' Senna_italica.fasta
+
+
+# Now do a job to run the rest find_orthos.sh 
+# They have nucleotides so use -d option 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name orthos_update
+#SBATCH --output=orthos_update_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+orthofinder -d -f primary_transcripts/
+
+# Try this and check in later 
+# Didn't take very long! Is this bad??? 
+# Orthofinder assigned 1114866 genes (74.0% of total) to 193598 orthogroups.
+# 9254 orthogroups where all species were present and 29 of those were single copy 
+# The number of single copy genes is troubling to me :| Maybe because diploid genomes? Maybe it's fine to use 
+# The good results are in Results_May19 
+
+# Check this out for ploidy and orthogroups https://github.com/conJUSTover/pSONIC
+
+
+# Okay I think we need to filter the transcripts somehow before using in the orthofinder program because there are lots of really short contigs and lots of multiple sequences per species (unsure of ploidy level) 
+# RSEM method will take only highly expressed isoforms - take out low expressed isoforms, redundant transcripts, and misassembled contigs 
+# I've already removed the redundant transcripts with CD-HIT-EST 
+# TransRate will remove poorly assembled contigs (chimeras and incomplete contigs) 
+
+# Try Transdecoder to find the open reading forms to find the genes - maybe this will be a better way to do it?? 
+
+# Then do we do orthofinder on the buscos? The bat paper did not do this - they ran orthofinder on the raw reads I think 
+# Or do I run orthofinder on the transdecoder genes??? Which one do I do??? 
+
+
+# Okay bassed on some other papers here is a workflow that could work 
+# rnaspades - check 
+# then redundancy filtering - check 
+# Transdecoder - remove any contigs that have no predicted peptide 
+# ortholog - use nucleotide or fa format as input? Transdecoder has peptide/fa format as one of theoutputs???? 
+
+
+# renamed the reduced assemblies aand moved directory
+# extract ORF 
+
+TransDecoder.LongOrfs -t Calliandra_eriophylla.fasta
+
+# Predict the coding regions 
+
+TransDecoder.Predict -t Calliandra_eriophylla.fasta
+
+# Then look into the directory it created and check the files 
+# The best ones will be in the main directory 
+transcripts.fasta.transdecoder.cds # This is the nucleotide seq for the final candidate ORF 
+transcripts.fasta.transdecoder.pep # peptide sequences (could be input for orthofinder) - shorter candidates within longer seq were removed 
+
+# Check how many genes/ORF there are 
+grep -c "^>" Calliandra_eriophylla.fasta.transdecoder.cds
+grep -c "^>" Calliandra_eriophylla.fasta.transdecoder.pep
+
+# For C. eriophylla there are 82106 ORF
+# Make script for all of them and run 
+
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=18:00:00
+#SBATCH --job-name decoder
+#SBATCH --output=decoder_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+TransDecoder.LongOrfs -t Senna_occidentalis.fasta
+TransDecoder.Predict -t Senna_occidentalis.fasta
+
+TransDecoder.LongOrfs -t Calliandra_humilis.fasta
+TransDecoder.Predict -t Calliandra_humilis.fasta
+
+TransDecoder.LongOrfs -t Dalea_mollis.fasta
+TransDecoder.Predict -t Dalea_mollis.fasta
+
+TransDecoder.LongOrfs -t Dalea_mollissima.fasta
+TransDecoder.Predict -t Dalea_mollissima.fasta
+
+TransDecoder.LongOrfs -t Mimosa_aculeaticarpa.fasta
+TransDecoder.Predict -t Mimosa_aculeaticarpa.fasta
+
+TransDecoder.LongOrfs -t Mimosa_grahamii.fasta
+TransDecoder.Predict -t Mimosa_grahamii.fasta
+
+TransDecoder.LongOrfs -t Peltophorum_africanum.fasta
+TransDecoder.Predict -t Peltophorum_africanum.fasta
+
+TransDecoder.LongOrfs -t Peltophorum_dubium.fasta
+TransDecoder.Predict -t Peltophorum_dubium.fasta
+
+TransDecoder.LongOrfs -t Senna_barclayana.fasta
+TransDecoder.Predict -t Senna_barclayana.fasta
+
+TransDecoder.LongOrfs -t Senna_didymobotrya.fasta
+TransDecoder.Predict -t Senna_didymobotrya.fasta
+
+TransDecoder.LongOrfs -t Senna_italica.fasta
+TransDecoder.Predict -t Senna_italica.fasta
+
+
+# Ok the numbers of the transdecoded ORFS look good to do the orthofinder stuff on 
+# Run primary transcripts script on the cds files 
+
+for f in *.pep ; do python /home/f/freder19/harri318/bin/OrthoFinder/tools/primary_transcript.py $f ; done &
+
+# Still not really reducing any genes though.... Do I need to do some other predictive and gene describer to get this to work or do something useful? 
+# It is Looking for "gene=" of "gene:" to identify isoforms of same gene - I'm pretty sure some had GENE= in the header???? 
+
+
+# After getting these is this where I should redo busco? 
+# Or annotate with OmicsBox to get the functions of the genes? 
+
+sed -i 's/>/>Senna_occidentalis_/g' Senna_occidentalis.fasta.transdecoder.cds
+sed -i 's/>/>Calliandra_eriophylla_/g' Calliandra_eriophylla.fasta.transdecoder.cds
+sed -i 's/>/>Calliandra_humilis_/g' Calliandra_humilis.fasta.transdecoder.cds
+sed -i 's/>/>Dalea_mollis_/g' Dalea_mollis.fasta.transdecoder.cds
+sed -i 's/>/>Dalea_mollissima_/g' Dalea_mollissima.fasta.transdecoder.cds
+sed -i 's/>/>Mimosa_aculeaticarpa_/g' Mimosa_aculeaticarpa.fasta.transdecoder.cds
+sed -i 's/>/>Mimosa_grahamii_/g' Mimosa_grahamii.fasta.transdecoder.cds
+sed -i 's/>/>Peltophorum_africanum_/g' Peltophorum_africanum.fasta.transdecoder.cds
+sed -i 's/>/>Peltophorum_dubium_/g' Peltophorum_dubium.fasta.transdecoder.cds
+sed -i 's/>/>Senna_barclayana_/g' Senna_barclayana.fasta.transdecoder.cds
+sed -i 's/>/>Senna_didymobotrya_/g' Senna_didymobotrya.fasta.transdecoder.cds
+sed -i 's/>/>Senna_italica_/g' Senna_italica.fasta.transdecoder.cds
+
+# Try orthofinder on the new ones 
+# Didn't seem to need the whole time so put ntasks per node down to 40 
+# Make sure to change the extension to fa for the program to work 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name orthos_cds
+#SBATCH --output=orthos_cds_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+orthofinder -d -f primary_transcripts/
+
+
+# Now try primary transcripts on the peptide and then do orthofinder on those as well 
+# Copy over the peptides to a new folder called peptides 
+# Go into assemblies/Orthofinder/transcoder/peptide_files/
+# Then add in the species names to the gene IDs 
+
+sed -i 's/>/>Senna_occidentalis_/g' Senna_occidentalis.fasta.transdecoder.pep
+sed -i 's/>/>Calliandra_eriophylla_/g' Calliandra_eriophylla.fasta.transdecoder.pep
+sed -i 's/>/>Calliandra_humilis_/g' Calliandra_humilis.fasta.transdecoder.pep
+sed -i 's/>/>Dalea_mollis_/g' Dalea_mollis.fasta.transdecoder.pep
+sed -i 's/>/>Dalea_mollissima_/g' Dalea_mollissima.fasta.transdecoder.pep
+sed -i 's/>/>Mimosa_aculeaticarpa_/g' Mimosa_aculeaticarpa.fasta.transdecoder.pep
+sed -i 's/>/>Mimosa_grahamii_/g' Mimosa_grahamii.fasta.transdecoder.pep
+sed -i 's/>/>Peltophorum_africanum_/g' Peltophorum_africanum.fasta.transdecoder.pep
+sed -i 's/>/>Peltophorum_dubium_/g' Peltophorum_dubium.fasta.transdecoder.pep
+sed -i 's/>/>Senna_barclayana_/g' Senna_barclayana.fasta.transdecoder.pep
+sed -i 's/>/>Senna_didymobotrya_/g' Senna_didymobotrya.fasta.transdecoder.pep
+sed -i 's/>/>Senna_italica_/g' Senna_italica.fasta.transdecoder.pep
+
+# Ran primary transcripts script but it didn't reduce anything???
+
+# Now try orthofinder on the peptides 
+# ortho_pep
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40 
+#SBATCH --time=24:00:00
+#SBATCH --job-name orthos_pep
+#SBATCH --output=orthos_pep_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+orthofinder -f primary_transcripts/
+
+
+
+## Okay the peptide files through orthofinder found 307 single copy genes that are common to all species!!! 
+## This seems a lot more promising, now use those codes to get the nucleotide files 
+## Then calculate trees and PAML on those genes 
+## Then do the dnds and wilcoxon paired tests with the medians!! Getting there! 
+
+## Copy all transcoder files and results over to ohta 
+scp -r /scratch/f/freder19/harri318/assemblies/Orthofinder/transcoder tia.harrison@ohta.eeb.utoronto.ca:/ohta/tia.harrison/MolecularProject/Plant_pairs/Niagara_seq/transcoder3/ 
+
+
+## These are the peptide files now need to go back and get the nucleotide files to do the alignment 
+## Found the cds files now need to add the species name to each of the headers 
+
+sed -i 's/>/>Senna_occidentalis_/g' Senna_occidentalis.fasta.transdecoder.cds
+sed -i 's/>/>Calliandra_eriophylla_/g' Calliandra_eriophylla.fasta.transdecoder.cds
+sed -i 's/>/>Calliandra_humilis_/g' Calliandra_humilis.fasta.transdecoder.cds
+sed -i 's/>/>Dalea_mollis_/g' Dalea_mollis.fasta.transdecoder.cds
+sed -i 's/>/>Dalea_mollissima_/g' Dalea_mollissima.fasta.transdecoder.cds
+sed -i 's/>/>Mimosa_aculeaticarpa_/g' Mimosa_aculeaticarpa.fasta.transdecoder.cds
+sed -i 's/>/>Mimosa_grahamii_/g' Mimosa_grahamii.fasta.transdecoder.cds
+sed -i 's/>/>Peltophorum_africanum_/g' Peltophorum_africanum.fasta.transdecoder.cds
+sed -i 's/>/>Peltophorum_dubium_/g' Peltophorum_dubium.fasta.transdecoder.cds
+sed -i 's/>/>Senna_barclayana_/g' Senna_barclayana.fasta.transdecoder.cds
+sed -i 's/>/>Senna_didymobotrya_/g' Senna_didymobotrya.fasta.transdecoder.cds
+sed -i 's/>/>Senna_italica_/g' Senna_italica.fasta.transdecoder.cds
+
+
+## Now pull out the right nucleotide sequences for analysis 
+## The list of the orthologs list 
+
+grep -Fwf Orthogroups_SingleCopyOrthologues.txt Orthogroups.tsv > OrthologsIDS_plant.txt
+
+## Put all cds files together
+cat * > big_cds_file.cds
+
+# Count the sequences 
+grep -c "^>" big_cds_file.cds # 773098 sequences 
+grep -c "^>" Peltophorum_africanum.fasta.transdecoder.cds # 59500
+grep -c "^>" Dalea_mollis.fasta.transdecoder.cds # 56375 so this checks out 
+
+
+## First clean up the labels 
+sed -i '/^>/ s/ .*//' big_cds_file.cds
+
+## Then make a text file of the files for each ortholog 
+## Then use grep to make the new files for each ortholog 
+
+grep -w -A 2 -f  ortho1.txt big_fasta.cds --no-group-separator > ortho1.fa
+
+## Test grep function for pulling out sequences 
+
+grep -w -A 2 -f test_seq big_cds_file.cds --no-group-separator > ortho1.fa
+
+## Split up the big ortholog group file into separate files 
+awk 'BEGIN {OFS="\t"} {print>$1}' OrthologsIDS_plant_test.txt
+
+## Replace tabs with new lines 
+sed -i 's/\t/\n/g' test 
+
+## Test it out on single file 
+grep -w -A 2 -f test big_cds_file.cds --no-group-separator > test.fa
+
+## Make big file with all the code 
+## Print the first column with the codes to new file 
+
+awk '{ print $1, $NF }' OrthologsIDS_plant_test.txt > pull_script
+cut -f1 -d' ' pull_script > pull_script2    # Cut the leftover 
+
+## Add the first part of the code to every line 
+sed -i 's/^/grep -w -A 2 -f /' pull_script2
+
+## Add the bit of code to the end of each row 
+sed -i 's/$/ big_cds_file.cds --no-group-separator > /' pull_script2
+
+## Now need to add the file names to the end of every line 
+## Make the file with the ortho names with .fa at the end 
+## Make new list of codes 
+awk '{ print $1, $NF }' OrthologsIDS_plant_test.txt > ortho_names
+cut -f1 -d' ' ortho_names > ortho_names2  
+
+## Add .fa to the end 
+sed -i 's/$/.fa/' ortho_names2
+
+## Now combine the two files together 
+## Make extra copes to be careful
+cp ortho_names2 ortho_names3
+cp pull_script2 pull_script3
+
+paste pull_script3 ortho_names3 > extraction_script
+
+## Fix the beginning of the script, sometimes spaces don't get found in sed
+sed 's/--no-group-separator//g' extraction_script > extraction_script2
+sed -i 's/grep[[:space:]]-w[[:space:]]-A[[:space:]]2[[:space:]]-f/seqkit grep -n -f/g' extraction_script2
+
+
+## For each ortho list need to replace the tabs with new lines 
+sed -i 's/\t/\n/g' OG* 
+
+## Change to unix file and add new line to the bottom 
+sed -i -e 's/\r\+$//' OG*
+ed -s OG* <<< w
+
+## Just test that the seq name is in the big file 
+awk '/Senna_occidentalis_NODE_41117_length_1326_cov_1846.839585_g19481_i0.p1/{print "Found."}' big_cds_file.cds
+
+## Run the script 
+nohup bash extraction_script2 &
+
+## Move to new folder since I made past mistakes 
+cp OG*.fa better_files 
+
+## Count the number of > headers in each file, there should be 12 
+grep -c ">" *.fa > Fasta_count.txt 
+
+## Do the prank alignment for all the genes 
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+## Then put in script and run in background 
+nohup bash prank_code &
+
+## Running in background on ohta 
+## May need to change this to Niagara to quicken up the pace 
+
+## Convert the files 
+## Run the program on all gene alignments, use script called conversion_loop
+
+for f in *.best.fas 
+do 
+	Fasta2Phylip.pl $f 
+done 
+
+## Do the trees on all the genes 
+## Maybe try multithreading with raxmlHPC-PTHREADS-SSE3
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+
+## The RAxML_bestTree.OG0001609.tree has branch lengths and the analysis will only output one tree 
+## Make list of ortholog names 
+ls *.best.fas.phy > OrthologNamesFile 
+
+## Clean up the names 
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Put code in createcodeml script and run 
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' codeml_lineage3.ctl > "$name".ctl
+done < OrthologNamesFile 
+
+## For loop is in script called PAML_run
+## This will run PAML on all the genes  
+## For some reason this didn't take too long on ohta server hmmm... suspicious?  
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+
+## Get the relevant files from the output 
+## Make a list of the ortholog names 
+ls *lineage.results > Ortholog_names
+sed -i 's/_lineage.results//g' Ortholog_names
+
+## For loop for first step in file called script1 
+for f in *lineage.results 
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_tree
+done 
+
+
+## For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+## While loop for third step in script called script3 
+## Add the gene name to the last column 
+for f in *_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+## Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree//g' $f
+done 
+
+## Cat together all the result files into one file 
+cat *_final_table > Plant_PAML_results.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' Plant_PAML_results.txt
+
+## Take the final file and look at it in R 
+## In excel add column headers for Species, dn/ds values, and gene name 
+
+## ACTUALLY IT MIGHT HAVE OUTPUT THE RESULTS IN OG0020507_lineage.results!!!!!!
+## Ugh, I can't believe I didn't see that before duh! 
+
+
+GO BACK AND DO THE DATA CALCULATION AGAIN TO MAKE SURE IT IS CORRECT!!!!
+
+
+## Try Hyphy - so here we are testing whether certain branches on the tree show positive selection 
+## This aBSREL will identify branches under pos selection without any a priori information 
+
+hyphy aBSREL --alignment OG0020600.best.fas --tree RAxML_bestTree.OG0020600.tree > test_out
+
+## Do a loop through them all 
+
+while read name; do
+	hyphy aBSREL --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree > "$name"_absresl.out
+done < OrthologNamesFile 
+
+
+
+
+
+
+
+## Need to extract information after the line: ### Adaptive branch site random effects likelihood test
+## Also need the gene name as well and output to a new file - would like to count how many showed diversifying selection on a branch 
+## Actually simpler if many have 0 branches under diversifying selection pull out all files that have this language and then delete them 
+
+grep -r "branches under selection among" *.ext > selection_files
+sed -i 's/**//g' selection_files
+sed -i '/found 0 branches/d' selection_files
+wc -l selection_files # 16 genes that show positive selection at some branch on the tree - have to look at them to figure out where 
+ls -lR ./*.out | wc -l # 308 genes total tested 
+
+## Make a new folder of all the genes with diversifying selection to copy over to new folder 
+
+sed -e "s/:Likelihood.*//g" selection_files > selection_files_clean # Replace all text after file name 
+sed -i 's/^..//' selection_files_clean # Cut the first two characters out 
+while read file; do cp "$file" pos_selection/ ; done < selection_files_clean # Move the files 
+ls | wc -l # all 16 files moved over but these are the .out files and we want the json files 
+
+## Go back to the other folder and get the right json files 
+
+sed -i 's/_absresl.out//g' selection_files_clean # Clean up the file 
+while read file; do cp "$file".best.fas.phy.ABSREL.json pos_selection/ ; done < selection_files_clean # Move the json files 
+ls | wc -l # All 16 genes 
+
+## Then save the json and look at the file under http:// 
+vision.hyphy.org/absrel website 
+## Then we look for branches that have a mostly low dn/ds ratio (black in colour) and you see a big change to blue (high dn/ds ratio) and specifically look at the significant ones 
+## Hmmm, very few places where you see a transfer on a branch to the species - but could look up these gene sequences to identify them in BLAST 
+## Is there a way to combine all the genes into a consensus tree and the changes in the branches? But this isn't really right since there is a gene tree for every gene 
+
+
+
+
+## Need to map the genes I already have the dnds ratios of to the symbiotic genes by Roy and see if those appear differently in the dnds wilcoxon test 
+## How to do the mapping, I have excel file of a huge number of reads 
+## map the transcripts to the files and then pull out the names that are in there? 
+## Use the .fa files in primary transcripts folder 
+## Align the reads of the sym genes to the fasta species files and then extract unaligned reads
+
+# How many Roy genes 
+grep -c "^>" Roy_genes.fasta # 863 genes total to see if they map 
+
+## Actually I am going to try making my species a reference and align the genes to those to identify them 
+
+bwa index Calliandra_eriophylla.fasta.transdecoder.cds # Index the reference 
+
+# Do the alignment 
+bwa mem Calliandra_eriophylla.fasta.transdecoder.cds Roy_genes.fasta > Calliandra_eriophylla_alignments.sam
+
+
+# Convert to bam 
+samtools view -b -T Calliandra_eriophylla.fasta.transdecoder.cds Calliandra_eriophylla_alignments.sam > Calliandra_eriophylla_alignments.bam
+
+# Sort the reads in order of where they align to the reference 
+samtools sort Calliandra_eriophylla_alignments.bam > Calliandra_eriophylla_alignments_sort.bam
+
+# Count how many reads mapped and to what position 
+# I think we just need one read 
+samtools depth Calliandra_eriophylla_alignments_sort.bam > Calliandra_eriophylla_depth.txt
+
+
+# Extract positions where the reads have mapped and count them up 
+awk -v OFS="\t" '$1=$1' Calliandra_eriophylla_depth.txt > Calliandra_eriophylla_depth2.txt # replace space with tabs
+awk -F"\t" '$3>0' Calliandra_eriophylla_depth2.txt > Calliandra_eriophylla_mapped_genes
+
+# Count the number of lines 
+wc -l Calliandra_eriophylla_mapped_genes # 214694 genes but that doesn't make any sensem but there are multiples of each gene 
+
+# Get first column 
+awk '{print $1}' Calliandra_eriophylla_mapped_genes > Calliandra_eriophylla_mapped_genes_names
+uniq Calliandra_eriophylla_mapped_genes_names > Calliandra_eriophylla_sym
+wc -l Calliandra_eriophylla_sym # 297 genes that symbiotic seq mapped to  
+wc -l Calliandra_eriophylla.fasta.transdecoder.cds # 1377482 sequences 
+
+
+## Repeat with the other symbiotic genomes and get the list of genes 
+## Test one non-symbiotic one 
+bwa index Dalea_mollis.fasta.transdecoder.cds # Index the reference
+bwa mem Dalea_mollis.fasta.transdecoder.cds Roy_genes.fasta > Dalea_mollis_alignments.sam
+samtools view -b -T Dalea_mollis.fasta.transdecoder.cds Dalea_mollis_alignments.sam > Dalea_mollis_alignments.bam
+samtools sort Dalea_mollis_alignments.bam > Dalea_mollis_alignments_sort.bam
+samtools depth Dalea_mollis_alignments_sort.bam > Dalea_mollis_depth.txt
+awk -v OFS="\t" '$1=$1' Dalea_mollis_depth.txt > Dalea_mollis_depth2.txt # replace space with tabs
+awk -F"\t" '$3>0' Dalea_mollis_depth2.txt > Dalea_mollis_mapped_genes
+awk '{print $1}' Dalea_mollis_mapped_genes > Dalea_mollis_mapped_genes_names
+uniq Dalea_mollis_mapped_genes_names > Dalea_mollis_sym
+
+wc -l Mimosa_grahamii_sym # 255 genes 
+wc -l Senna_barclayana_sym # 243 genes 
+wc -l Peltophorum_africanum_sym # 274 genes 
+wc -l Dalea_mollissima_sym # 267 genes 
+wc -l Senna_italica_sym # 277 genes 
+wc -l Calliandra_eriophylla_sym # 297 genes 
+
+cat Mimosa_grahamii_sym Senna_barclayana_sym Peltophorum_africanum_sym Dalea_mollissima_sym Senna_italica_sym Calliandra_eriophylla_sym > plant_symbiotic_genes
+
+## Running out of space!! Compress a folder 
+tar -zcvf Trimm4.tar.gz Trimm4 &
+
+
+
+## Calculate PAML on genes that are in 4 species 
+## Find the Orthogroups file and remove paralogs 
+
+awk '$0 !~ /,/' Orthogroups.tsv > single_all_orthos1.txt
+wc -l single_all_orthos.txt # 27426
+
+## Remove the orthologs that were already done in the single copy (all 12 species) 
+wc -l OrthologNamesFile # 307  
+awk 'NR == FNR {a[$1]; next} !($1 in a)' OrthologNamesFile single_all_orthos1.txt > single_all_orthos_unique_new.txt 
+wc -l single_all_orthos_unique_new.txt # 27412 - only removed 14 its not right 
+
+## Count the number of words per line 
+awk -F'[: \t]+' '{print NF}' single_all_orthos_unique_new.txt > counts
+
+## Count the number of genes greater than 5 
+awk '$1>5{c++} END{print c+0}' counts # 3396 that's a lot! 
+
+## Take these first 3396 lines that have at least 4 comparisons 
+head -3396 single_all_orthos_unique_new.txt > single_all_orthos_unique_four.txt
+## Check out the number of counts 
+awk -F'[: \t]+' '{print NF}' single_all_orthos_unique_four.txt > counts_four
+
+## Move the proper file for combining the sequences for orthogroups 
+## remove the first line 
+sed '1d' single_all_orthos_unique_four.txt > single_all_orthos_unique_four_new.txt
+
+## Break up file 
+awk 'BEGIN {OFS="\t"} {print>$1}' single_all_orthos_unique_four_new.txt
+# replace tabs with new lines 
+sed -i 's/\t/\n/g' OG*
+# Remove blank lines 
+sed -i '/^[[:space:]]*$/d' OG*
+
+## Make big file with all the code 
+## Print the first column with the codes to new file 
+awk '{ print $1, $NF }' single_all_orthos_unique_four_new.txt > pull_script
+cut -f1 -d' ' pull_script > pull_script2    # Cut the leftover 
+
+## Add the first part of the code to every line 
+sed -i 's/^/grep -w -A 2 -f /' pull_script2
+
+## Add the bit of code to the end of each row 
+sed -i 's/$/ big_cds_file.cds --no-group-separator > /' pull_script2
+
+## Make new list of codes 
+awk '{ print $1, $NF }' single_all_orthos_unique_four_new.txt > ortho_names
+cut -f1 -d' ' ortho_names > ortho_names2  
+sed -i 's/$/.fa/' ortho_names2
+
+## Make extra copes to be careful
+cp ortho_names2 ortho_names3
+cp pull_script2 pull_script3
+
+paste pull_script3 ortho_names3 > extraction_script
+
+## Fix the beginning of the script, sometimes spaces don't get found in sed
+sed 's/--no-group-separator//g' extraction_script > extraction_script2
+sed -i 's/grep[[:space:]]-w[[:space:]]-A[[:space:]]2[[:space:]]-f/seqkit grep -n -f/g' extraction_script2
+
+# Change to unix 
+sed -i -e 's/\r\+$//' OG*
+ed -s OG* <<< w
+
+# Run the script 
+nohup bash extraction_script2 &
+
+
+## Count the number of > headers in each file, it might vary here but the least should be 5 
+grep -c ">" *.fa > Fasta_count.txt 
+## Hmm there are still some here that have all 12 - could put these towards the hyphy tests - do the hyphy on these as well 
+
+## Do the prank alignment for all the genes 
+## Do in niagara bc this is taking way too long 
+
+## Prank alignment script 
+
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name prank_4
+#SBATCH --output=prank_4_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+
+## Might need to cancel a job 
+scancel -i 8962294 
+
+
+
+## Do raxml trees in niagara 
+
+#!/bin/bash
+#SBATCH --nodes=10
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name raxml_sin
+#SBATCH --output=raxml_sin_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+
+## Make list of ortholog names 
+ls *.best.fas.phy > OrthologNamesFile 
+sed -i 's/.best.fas.phy//g' OrthologNamesFile
+
+## Put code in createcodeml script and run 
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' codeml_lineage3.ctl > "$name".ctl
+done < OrthologNamesFile 
+
+## For loop is in script called PAML_run
+
+
+#!/bin/bash
+#SBATCH --nodes=15
+#SBATCH --ntasks-per-node=80 
+#SBATCH --time=24:00:00
+#SBATCH --job-name paml_4
+#SBATCH --output=paml_4_%j.txt
+
+module load NiaEnv/2019b intelpython3
+source activate myPythonEnv
+
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+## Not really running on niagara so going to try back on ohta 
+## Split the big file into multiple to run at the same time 
+
+ls *.ctl > ortholist 
+split -l 300 ortholist segment 
+
+## Run all the files 
+while read file; do 
+	codeml "$file"
+done < segmentah
+
+
+scp -r /ohta/tia.harrison/SoilNoduleSamples/ tia.harrison@capsicum.eeb.utoronto.ca:/cap1/tia.harrison/OhtaStuff
+
+
+## Get the results from the 4+ species genes = 3396 genes 
+## Get the relevant files from the output 
+## Make a list of the ortholog names 
+ls *lineage.results > Ortholog_names
+sed -i 's/_lineage.results//g' Ortholog_names
+
+## For loop for first step in file called script1 
+for f in *lineage.results 
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_tree
+done 
+
+
+## For loop for second step in file called script2 
+for f in *_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+## While loop for third step in script called script3 
+## Add the gene name to the last column 
+for f in *_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+## Remove "_lineage_tree" from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_lineage_tree//g' $f
+done 
+
+## Cat together all the result files into one file 
+cat *_final_table > Plant_PAML_results4.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' Plant_PAML_results4.txt
+
+# Remove the lines that just have the ortholog name 
+cp Plant_PAML_results4.txt Plant_PAML_results4_test.txt
+sed -i '/^\s\s*/d' Plant_PAML_results4_test.txt
+sed -i '/^Timeused/d' Plant_PAML_results4_test.txt
+
+## Take the final file and look at it in R 
+## In excel add column headers for Species, dn/ds values, and gene name 
+
+
+
+## Still not right 
+## Try site model in hyphy 
+
+# Change mutualist and free to test and reference 
+sed -i 's/{mutualist}/{test}/g' RAxML_bipartitions*
+sed -i 's/{free}/{reference}/g' RAxML_bipartitions*
+
+# Test run on RAxML_bipartitions.OG0019903.tree
+nohup bash hyphy contrast-fel --alignment OG0019903.best.fas.phy --tree RAxML_bipartitions.OG0019903.tree --reference --test > OG0019903_fel.out &
+
+
+# Run on all the files 
+while read name; do 
+	hyphy contrast-fel --alignment OG0019903.best.fas.phy --tree RAxML_bipartitions.OG0019903.tree > OG0019903_fel.out
+done < OrthologNamesFile
+
+GAINS
+HYPHY
+Hyphy_RELAX
+LOSS
+
+
+## Only thing I can think is to remove the branch lengths from the trees, add the labels and then try again 
+## SHould be unrooted tree, could have outgroup but then we would have fewer orthologs 
+## RAxML_bipartitions tree might be best bet - need to remove the numbers and : 
+
+sed -i 's/1//g' RAxML_bipartitions.*
+sed -i 's/2//g' RAxML_bipartitions.*
+sed -i 's/3//g' RAxML_bipartitions.*
+sed -i 's/4//g' RAxML_bipartitions.*
+sed -i 's/5//g' RAxML_bipartitions.*
+sed -i 's/6//g' RAxML_bipartitions.*
+sed -i 's/7//g' RAxML_bipartitions.*
+sed -i 's/8//g' RAxML_bipartitions.*
+sed -i 's/9//g' RAxML_bipartitions.*
+sed -i 's/://g' RAxML_bipartitions.*
+sed -i 's/0//g' RAxML_bipartitions.*
+sed -i 's/\.//g' RAxML_bipartitions.*
+
+# Change the labels 
+sed -i 's/{mutualist}/ #1 /g' RAxML_bipartitions.*
+sed -i 's/{free}/ #2 /g' RAxML_bipartitions.*
+
+# So far the #1 and #2 labels seem to give consistent answers!!! Let's do this again! 
+sed -i 's/#0/#2/g' *tree.trees
+
+# Duplicate the tree 
+ls RAxML_bipartitions.* > tree_list 
+sed -i 's/RAxML_bipartitions.//g' tree_list
+sed -i 's/.tree//g' tree_list
+
+# Add the second tree to second line 
+while read file; do
+	awk '{print ">"$0}1' RAxML_bipartitions."$file".tree > "$file"_tree.trees
+done < tree_list
+
+# Replace labels in the first line 
+sed -i '1s/ #0 //g' *tree.trees
+sed -i '1s/ #1 //g' *tree.trees
+sed -i '1!b;s/>//' *tree.trees
+sed -i '1 i\\t2' *tree.trees
+
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' two_rate_gain.ctl > "$name".ctl
+done < tree_list 
+
+# Make the dalea label good 
+sed -i 's/Dalea_mollis/Dalea_mollis1/g' *tree.trees
+sed -i 's/Dalea_mollis1sima/Dalea_mollissima/g' *tree.trees
+
+
+# Test direction 
+codeml OG0020582.ctl
+# THis works! So need to get rid of teh branch lengths in the trees then it is okay
+
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+## Get the data 
+## Great that ran really fast 
+## Extract all the files where the second tree is significant (two rates instead of one rate) 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+ 
+while read name; do
+	grep -A3 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+
+
+# Move the files to new folder and then run this 
+grep -Ril "2sig" *treecomp > 2sig_results
+wc -l 2sig_results # 277 full, 290 gain, 187 loss 
+
+grep -Ril "1sig" *treecomp> 1sig_results
+wc -l 1sig_results # 0 full, 0 gain, 1 loss 
+
+# But it could still be worth re-running the wilcoxon tests on these new values bc they might be a better estimate than the free ratio so we could still extract these 
+# Still break up by gain and loss? 
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  2: 
+sed -i 's/_treecomp//g' 2sig_results
+
+while read file; do 
+	sed -ne '/TREE #  2:/,$ p' "$file"_result.out > "$file"_tree2.out
+done < 2sig_results
+
+# Extract the values 
+for f in *tree2.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_2ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_2ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_2ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_6_tree2_2ratio_tree//g' $f
+done 
+
+
+# Only take the first 12 lines 
+while read file; do 
+	head -12 "$file"_tree2_2ratio_tree_final_table > "$file"_new_table
+done < 2sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > full_2w.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' full_2w.txt 
+
+# Add that these are gain estimates at the end 
+# sed -i "s/$/\tloss/" loss_2w.txt 
+
+# Some labels are messed up 
+# Remove everything after second _ in the first column 
+# sed 's/\(_[^_]*\)\S*/\1/' loss_2w2.txt > test_final
+sed 's/\(_[^_]*\)\S*/\1/' full_2w.txt > full_2w_test.txt
+
+# Cat the loss and gain together 
+cat loss_2w_test.txt gain_2w_test.txt > combo_2w.txt
+
+# Save new file 
+cp combo_2w.txt TwoRateCombo.txt
+
+# Chaotic clean up 
+sed -i 's/_tree2_2ratio_tree//g' full_2w_test.txt
+sed -i 's/loss//g' full_2w_test.txt
+
+
+
+## Test the gains in the other direction just to be sure 
+
+sed -i 's/#2/#prev2/g' *tree.trees
+sed -i 's/#1/#prev1/g' *tree.trees
+sed -i 's/#prev2/#1/g' *tree.trees
+sed -i 's/#prev1/#2/g' *tree.trees
+
+
+
+## Do the two ratio models in PAML 
+## Do paml test for the two selections 
+## Make the tree 
+
+sed -i 's/{mutualist}/ #1 /g' RAxML_bestTree*
+sed -i 's/{free}/ #0 /g' RAxML_bestTree*
+
+# Duplicate the tree 
+ls RAxML_bestTree* > tree_list 
+sed -i 's/RAxML_bestTree.//g' tree_list
+sed -i 's/.tree//g' tree_list
+
+# Add the second tree to second line 
+while read file; do
+	awk '{print ">"$0}1' RAxML_bestTree."$file".tree > "$file"_tree.trees
+done < tree_list
+
+# Replace labels in the first line 
+sed -i '1s/ #0 //g' *tree.trees
+sed -i '1s/ #1 //g' *tree.trees
+sed -i '1!b;s/>//' *tree.trees
+sed -i '1 i\\t2' *tree.trees
+
+# Replace the #0 with #2
+sed -i 's/#0/#2/g' *tree.trees
+
+## This creates a codeml file for each gene 
+while read name; do
+	sed 's/OrthologName/'"$name"'/g' two_rate_gain.ctl > "$name".ctl
+done < tree_list 
+
+## For loop is in script called PAML_run
+## This will run PAML on all the genes  
+## For some reason this didn't take too long on ohta server hmmm... suspicious?  
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+## Great that ran really fast 
+## Extract all the files where the second tree is significant (two rates instead of one rate) 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+ 
+while read name; do
+	grep -A3 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+
+
+# Move the files to new folder and then run this 
+grep -Ril "2sig" > 2sig_results
+wc -l 2sig_results # 306 gain 307 loss, 307 for full 
+
+grep -Ril "1sig" > 1sig_results
+wc -l 1sig_results # 2 gain 0 for loss, 0 for full 
+
+# But it could still be worth re-running the wilcoxon tests on these new values bc they might be a better estimate than the free ratio so we could still extract these 
+# Still break up by gain and loss? 
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  2: 
+sed -i 's/_treecomp//g' 2sig_results
+
+while read file; do 
+	sed -ne '/TREE #  2:/,$ p' "$file"_result.out > "$file"_tree2.out
+done < 2sig_results
+
+# Extract the values 
+for f in *tree2.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_2ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_2ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_2ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_6_tree2_2ratio_tree//g' $f
+done 
+
+
+# Only take the first 12 lines 
+while read file; do 
+	head -12 "$file"_tree2_2ratio_tree_final_table > "$file"_new_table
+done < 2sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > full_2w.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' full_2w.txt 
+
+# Add that these are gain estimates at the end 
+# sed -i "s/$/\tloss/" full_2w.txt 
+
+# Some labels are messed up 
+# Remove everything after second _ in the first column 
+# sed 's/\(_[^_]*\)\S*/\1/' loss_2w2.txt > test_final
+sed 's/\(_[^_]*\)\S*/\1/' full_2w.txt > full_2w_test.txt
+
+# Chaotic clean up 
+sed -i 's/_tree2_2ratio_tree//g' full_2w_test.txt
+sed -i 's/loss//g' full_2w_test.txt
+
+
+## Really need that nested model 
+## Make list of the genes 
+
+ls *.ctl > genes_list 
+sed -i 's/.ctl//g' genes_list 
+
+## So compare all one ratio to 2 ratio to 4 ratio model (loss and gain included) and compete these 
+## Copy the second tree to new file 
+
+while read name; do 
+	sed -n '0~3p' "$name"_tree.trees > "$name"_tree_test
+done < genes_list 
+
+## Replace the labels 
+sed -i 's/Dalea_mollissima #2/Dalea_mollissima #3/g' *_tree_test
+sed -i 's/Dalea_mollis1 #1/Dalea_mollis1 #4/g' *_tree_test
+sed -i 's/Mimosa_aculeaticarpa #2/Mimosa_aculeaticarpa #3/g' *_tree_test
+sed -i 's/Mimosa_grahamii #1/Mimosa_grahamii #4/g' *_tree_test
+sed -i 's/Calliandra_humilis #1/Calliandra_humilis #4/g' *_tree_test
+sed -i 's/Calliandra_eriophylla #2/Calliandra_eriophylla #3/g' *_tree_test
+
+## Then cat together 
+
+while read name; do 
+	cat "$name"_tree.trees "$name"_tree_test > "$name"_four.trees 
+done < genes_list 
+
+## Replace 3 with 2 in the first line 
+
+sed -i '1s/2/3/g' *four.trees 
+
+## And re-run PAML for the billionth time! At least now it works properly 
+## Break up the genes list to make it go faster! 
+
+split -l 40 genes_list segment
+
+while read name; do 
+	codeml "$name".ctl 
+done < segmentah 
+
+## Grab data from nested model 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+ 
+while read name; do
+	grep -A4 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+sed -i 's/3\*/3sig/g' *treecomp # 3rd tree sig 
+
+# Move the files to new folder and then run this 
+wc -l Ortholog_names # 308 genes tested 
+grep -Ril "3sig" *treecomp > 3sig_results
+wc -l 3sig_results # 277 genes 
+
+grep -Ril "1sig" *treecomp > 1sig_results
+wc -l 1sig_results # 0 
+
+grep -Ril "2sig" *treecomp > 2sig_results
+wc -l 2sig_results # 0 
+
+# But it could still be worth re-running the wilcoxon tests on these new values bc they might be a better estimate than the free ratio so we could still extract these 
+# Still break up by gain and loss? 
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  3: 
+sed -i 's/_treecomp//g' 3sig_results
+
+while read file; do 
+	sed -ne '/TREE #  3:/,$ p' "$file"_result.out > "$file"_tree3.out
+done < 3sig_results
+
+# Extract the values 
+for f in *tree3.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_3ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_3ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_3ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_6_tree3_3ratio_tree//g' $f
+done 
+
+
+# Only take the first 12 lines 
+while read file; do 
+	head -12 "$file"_tree3_3ratio_tree_final_table > "$file"_new_table
+done < 3sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > full_3w.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' full_3w.txt 
+
+# Some labels are messed up 
+# Remove everything after second _ in the first column 
+# sed 's/\(_[^_]*\)\S*/\1/' loss_2w2.txt > test_final
+sed 's/_tree3_3ratio_tree//g' full_3w.txt > full_3w_test.txt
+
+
+
+# Test 3 trees against each other 
+# Everything as one? 
+# 6 rate each pair 
+# 12 each species 
+
+## Replace the labels 
+
+
+sed -i '3s/Senna_occidentalis #1/Senna_occidentalis #2/' *four.trees
+sed -i '3s/Senna_didymobotrya #1/Senna_didymobotrya #3/' *four.trees
+sed -i '3s/Senna_italica #2/Senna_italica #3/' *four.trees
+sed -i '3s/Calliandra_eriophylla #2/Calliandra_eriophylla #4/' *four.trees
+sed -i '3s/Calliandra_humilis #1/Calliandra_humilis #4/' *four.trees
+sed -i '3s/Mimosa_aculeaticarpa #2/Mimosa_aculeaticarpa #5/' *four.trees
+sed -i '3s/Mimosa_grahamii #1/Mimosa_grahamii #5/' *four.trees
+sed -i '3s/Peltophorum_africanum #2/Peltophorum_africanum #6/' *four.trees
+sed -i '3s/Peltophorum_dubium #1/Peltophorum_dubium #6/' *four.trees
+sed -i '3s/Dalea_mollissima #2/Dalea_mollissima #1/' *four.trees
+
+
+sed -i '4s/Senna_didymobotrya #1/Senna_didymobotrya #5/' *four.trees
+sed -i '4s/Senna_italica #2/Senna_italica #6/' *four.trees
+sed -i '4s/Calliandra_humilis #4/Calliandra_humilis #7/' *four.trees
+sed -i '4s/Mimosa_aculeaticarpa #3/Mimosa_aculeaticarpa #8/' *four.trees
+sed -i '4s/Mimosa_grahamii #4/Mimosa_grahamii #9/' *four.trees
+sed -i '4s/Peltophorum_africanum #2/Peltophorum_africanum #10/' *four.trees
+sed -i '4s/Peltophorum_dubium #1/Peltophorum_dubium #11/' *four.trees
+sed -i '4s/Dalea_mollissima #3/Dalea_mollissima #12/' *four.trees
+
+
+# And re-run! 
+# Try again compare 6 rate to 12 rates 
+
+sed -i '1s/3/2/' *four.trees
+sed -i '2d' *four.trees
+
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+# Get the values - this is from results folder 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+wc -l Ortholog_names # 308 genes tested 
+ 
+while read name; do
+	grep -A4 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+
+# Move the files to new folder and then run this 
+wc -l Ortholog_names # 308 genes tested 
+
+grep -Ril "1sig" *treecomp > 1sig_results
+wc -l 1sig_results # 0 
+
+grep -Ril "2sig" *treecomp > 2sig_results
+wc -l 2sig_results # 277  
+
+# But it could still be worth re-running the wilcoxon tests on these new values bc they might be a better estimate than the free ratio so we could still extract these 
+# Still break up by gain and loss? 
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  2: 
+sed -i 's/_treecomp//g' 2sig_results
+
+while read file; do 
+	sed -ne '/TREE #  2:/,$ p' "$file"_result.out > "$file"_tree2.out
+done < 2sig_results
+
+# Extract the values 
+for f in *tree2.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_2ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_2ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_2ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_tree2_2ratio_tree//g' $f
+done 
+
+
+# Only take the first 12 lines 
+while read file; do 
+	head -12 "$file"_tree2_2ratio_tree_final_table > "$file"_new_table
+done < 2sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > sixrateplants.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' sixrateplants.txt 
+
+# Clean up the headers 
+
+
+
+
+# Do the invasion status 
+# 1 is non invasive, 2 is invasive 
+
+sed -i '3s/Peltophorum_dubium #6/Peltophorum_dubium #2/' *four.trees
+sed -i '3s/Senna_occidentalis #2/Senna_occidentalis #2/' *four.trees
+sed -i '3s/Senna_barclayana #2/Senna_barclayana #1/' *four.trees
+sed -i '3s/Calliandra_eriophylla #2/Calliandra_eriophylla #1/' *four.trees
+sed -i '3s/Senna_didymobotrya #3/Senna_didymobotrya #2/' *four.trees
+sed -i '3s/Senna_italica #3/Senna_italica #2/' *four.trees
+sed -i '3s/Mimosa_grahamii #5/Mimosa_grahamii #1/' *four.trees
+sed -i '3s/Mimosa_aculeaticarpa #5/Mimosa_aculeaticarpa #1/' *four.trees
+sed -i '3s/Calliandra_eriophylla #4/Calliandra_eriophylla #1/' *four.trees
+sed -i '3s/Calliandra_humilis #4/Calliandra_humilis #1/' *four.trees
+sed -i '3s/Peltophorum_africanum #6/Peltophorum_africanum #2/' *four.trees
+
+# These are good to go already 
+# Dalea_mollis1 #1
+# Dalea_mollissima #1
+
+## Replace 3 with 2 in the first line 
+
+sed -i '1s/3/2/g' *four.trees
+
+# Remove fourth line 
+sed -i '4d' *four.trees
+
+
+for file in *.ctl
+do 
+	codeml $file
+done 
+
+# Now get the new values 
+# Get the values - this is from results folder 
+
+ls *result.out > Ortholog_names
+sed -i 's/_result.out//g' Ortholog_names
+wc -l Ortholog_names # 308 genes tested 
+ 
+while read name; do
+	grep -A4 "tree           li       Dli     +- SE     pKH       pSH    pRELL" "$name"_result.out | grep -v -- "^--$" > "$name"_treecomp
+done < Ortholog_names
+
+# Change the * to sig or something easier to extract 
+
+sed -i 's/2\*/2sig/g' *treecomp # 2nd tree sig 
+sed -i 's/1\*/1sig/g' *treecomp # 1st tree sig 
+
+# Move the files to new folder and then run this 
+wc -l Ortholog_names # 308 genes tested 
+
+grep -Ril "1sig" *treecomp > 1sig_results
+wc -l 1sig_results # 0 
+
+grep -Ril "2sig" *treecomp > 2sig_results
+wc -l 2sig_results # 277 genes significant 
+
+## Grab the values from the significant list 
+## Grab everything after TREE #  2: 
+sed -i 's/_treecomp//g' 2sig_results
+
+while read file; do 
+	sed -ne '/TREE #  2:/,$ p' "$file"_result.out > "$file"_tree2.out
+done < 2sig_results
+
+# Extract the values 
+for f in *tree2.out
+do 
+	awk '/w ratios as labels for TreeView:/,EOF' $f > ${f%%.*}_2ratio_tree
+done 
+
+
+# For loop for second step in file called script2 
+for f in *_2ratio_tree
+do 
+	sed -i 's/,/\n/g' $f
+	sed -i 's/(//g' $f
+	sed -i 's/)//g' $f
+	sed -i 's/#[^#]*//2g' $f
+	sed -i 's/;//g' $f
+	sed -i 's/ //g' $f
+	sed -i 's/#/\t/g' $f
+	sed -i '1d;$d' $f
+	sed -i '$d' $f
+	sed -i '$d' $f
+done 
+
+
+# While loop for third step in script called script3 
+# Add the gene name to the last column 
+for f in *_2ratio_tree
+do
+	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
+done 
+
+# Remove crap from the last column of data in script4 
+for f in *_final_table
+do 
+	sed -i 's/_tree2_2ratio_tree//g' $f
+done 
+
+
+# Only take the first 12 lines 
+while read file; do 
+	head -12 "$file"_tree2_2ratio_tree_final_table > "$file"_new_table
+done < 2sig_results
+
+# Cat together all the result files into one file 
+cat *_new_table > invasionrates.txt 
+
+# Add a tab between the dnds and gene name values 
+sed -i 's/ /\t/g' invasionrates.txt 
+
+# Here are the values! Go test the invasion result 
+
+
+
+
+
+
+
+## Not sure if the abresl test is quite right 
+## Could also use the GARD protocol on alignments before using them as input because it will tell if there is recombination 
+## BUSTED - detect pos selection at genes and can set pre-specified lineages 
+## RELAX - detect relaxed or intense purifying selection at genes and can use pre-specified lineages 
+## Doesn't seem like a test that can do both (find pos or neg selection among genes) 
+## Might be able to use just the tree input file bc it has the sequence --> .best.fas.phy extension 
+## Ok to label the trees I need to do this: 
+CAVEFISH{Foreground}:  
+SMIC{Reference}:  
+So right before the : I need to add in {} whether it is a reference or test branch, then it is good for input, I wonder if I can do mutualist and non-mutualists and it will output those 
+I suppose when there is a mutualist gain the reference will be non mutualists and when there is a mutualist loss the reference will be the mutualist
+For the whole tree I suppose I can just put in ref as non mutualist and test as mutualist - let's try it! 
+Actually in the phy format it might be easier to add in the reference and test in there 
+Might need to change to nexus file? and the labels can be anything mut and nonmut will work 
+
+
+## Move all files into HYPHY folder 
+## Change the labels 
+for file in *.phy
+do 
+sed -i -e 's/Calliandra_eriophylla.*p1/Calliandra_eriophylla{mutualist}/g 
+	   	  s/Calliandra_humilis.*p1/Calliandra_humilis{free}/g
+	      s/Mimosa_aculeaticarpa.*p1/Mimosa_aculeaticarpa{mutualist}/g
+	      s/Mimosa_grahamii.*p1/Mimosa_grahamii{free}/g
+	      s/Dalea_mollis_.*p1/Dalea_mollis1{free}/g
+	      s/Dalea_mollissima.*p1/Dalea_mollissima{mutualist}/g
+	      s/Senna_barclayana.*p1/Senna_barclayana{mutualist}/g
+	      s/Senna_occidentalis.*p1/Senna_occidentalis{free}/g
+	      s/Senna_didymobotrya.*p1/Senna_didymobotrya{free}/g
+	      s/Senna_italica.*p1/Senna_italica{mutualist}/g
+	      s/Peltophorum_africanum.*p1/Peltophorum_africanum{mutualist}/g
+	      s/Peltophorum_dubium.*p1/Peltophorum_dubium{free}/g' $file
+done
+
+## Redo the trees with the right names 
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+## Remove the labels from phy files 
+
+sed -i 's/{free}//g' *.fas.phy
+sed -i 's/{mutualist}//g' *.fas.phy
+
+## Run hyphy RELAX model! 
+
+
+while read name; do 
+	hyphy RELAX --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree --test mutualist --reference free > "$name"_relax.out
+done < OrthologNamesFile
+
+## Grab the information on the likelihood test 
+
+grep -o '^\Likelihood ratio test.*' *.out > gene_results
+awk -v OFS="\t" '$1=$1' gene_results > gene_results2 # replace space with tabs
+sed -i 's/\*\*\.//g' gene_results2
+awk -F"\t" '$6<0.05' gene_results2 > sig_genes
+sed -i 's/_relax.out:Likelihood//g' sig_genes
+
+## These are genes that show significant difference on the test branches compared to the reference branches
+## I think we will want to repeat this with just the gains (where mut is test) and just the losses (where mut is reference) 
+
+## Here we are removing the losses so that we have gains left over 
+## Have to loop through this to save new file 
+## Make list of all the genes 
+
+ls *.fa > Gene_names
+sed -i 's/.fa//g' Gene_names
+
+while read file; do 
+
+seqkit grep -rvip "^Calliandra_eriophylla" "$file".fa > "$file"_1.fa
+seqkit grep -rvip "^Calliandra_humilis" "$file"_1.fa > "$file"_2.fa
+seqkit grep -rvip "^Dalea_mollissima" "$file"_2.fa > "$file"_3.fa
+seqkit grep -rvip "^Dalea_mollis" "$file"_3.fa > "$file"_4.fa
+seqkit grep -rvip "^Mimosa_aculeaticarpa" "$file"_4.fa > "$file"_5.fa
+seqkit grep -rvip "^Mimosa_grahamii" "$file"_5.fa > "$file"_6.fa
+
+done < Gene_names
+
+## Move the _6 sequences to new folder and count the number 
+## Test the number of sequences 
+grep -c "^>" *.fa #6 
+
+## Redo the alignments 
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+## THen repeat with teh losses!! 
+
+## Make list of all the genes 
+
+ls *.fa > Gene_names
+sed -i 's/.fa//g' Gene_names
+
+while read file; do 
+
+seqkit grep -rvip "^Peltophorum_africanum" "$file".fa > "$file"_1.fa
+seqkit grep -rvip "^Peltophorum_dubium" "$file"_1.fa > "$file"_2.fa
+seqkit grep -rvip "^Senna_barclayana" "$file"_2.fa > "$file"_3.fa
+seqkit grep -rvip "^Senna_didymobotrya" "$file"_3.fa > "$file"_4.fa
+seqkit grep -rvip "^Senna_italica" "$file"_4.fa > "$file"_5.fa
+seqkit grep -rvip "^Senna_occidentalis" "$file"_5.fa > "$file"_6.fa
+
+done < Gene_names
+
+## Move the _6 sequences to new folder and count the number 
+## Test the number of sequences 
+grep -c "^>" *.fa #6 
+
+## Redo the alignments 
+
+for f in *.fa
+do 
+	prank -d=$f -o=${f%%.*} -codon -F 
+done 
+
+## Then do the conversions and run hyphy 
+for f in *.best.fas 
+do 
+	Fasta2Phylip.pl $f 
+done 
+
+## Clean the names 
+
+for file in *.phy
+do 
+sed -i -e 's/Calliandra_eriophylla.*p1/Calliandra_eriophylla{mutualist}/g 
+	   	  s/Calliandra_humilis.*p1/Calliandra_humilis{free}/g
+	      s/Mimosa_aculeaticarpa.*p1/Mimosa_aculeaticarpa{mutualist}/g
+	      s/Mimosa_grahamii.*p1/Mimosa_grahamii{free}/g
+	      s/Dalea_mollis_.*p1/Dalea_mollis1{free}/g
+	      s/Dalea_mollissima.*p1/Dalea_mollissima{mutualist}/g
+	      s/Senna_barclayana.*p1/Senna_barclayana{mutualist}/g
+	      s/Senna_occidentalis.*p1/Senna_occidentalis{free}/g
+	      s/Senna_didymobotrya.*p1/Senna_didymobotrya{free}/g
+	      s/Senna_italica.*p1/Senna_italica{mutualist}/g
+	      s/Peltophorum_africanum.*p1/Peltophorum_africanum{mutualist}/g
+	      s/Peltophorum_dubium.*p1/Peltophorum_dubium{free}/g' $file
+done
+
+## Do the trees 
+
+for f in *.phy 
+do 
+	raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s $f -n ${f%%.*}.tree  
+done 
+
+
+## Remove the labels from phy files 
+
+sed -i 's/{free}//g' *.fas.phy
+sed -i 's/{mutualist}//g' *.fas.phy
+
+
+## Run hyphy RELAX model! Just change the test and reference (but actually I don't think it matters)  
+
+while read name; do 
+	hyphy RELAX --alignment "$name"_6.best.fas.phy --tree RAxML_bestTree."$name"_6.tree --test free --reference mutualist > "$name"_relax.out
+done < OrthologNamesFile
+
+## Get the values 
+## I want the p value and I want the two values one for mutualist and one for free, it can still be for each species I think 
+## It should be able to be added to the big dataset I already have, then I can group by gene after in R 
+
+## P values 
+grep -o '^\Likelihood ratio test.*' *.out > gene_results_gain
+awk -v OFS="\t" '$1=$1'  gene_results_gain >  gene_results_gain2 # replace space with tabs
+sed -i 's/\*\*\.//g' gene_results_gain2
+sed -i 's/_relax.out:Likelihood//g' gene_results_gain2
+cat gene_results_gain2 | awk '{ print $1, $6 }' > gene_results_gain3 
+sed -i '1 i\Gene pvalue' gene_results_gain3 
+
+## Ratios 
+grep -E 'non-synonymous/synonymous rate ratio for' *.out > ref_results_gain
+sed -i 's/\*//g' ref_results_gain
+sed -i 's/_relax.out://g' ref_results_gain # Clean the data 
+awk -v OFS="\t" '$1=$1' ref_results_gain > ref_results_gain2 # replace space with tabs
+cat ref_results_gain2 | awk '{ print $1, $6, $8 }' > ref_results_gain3
+awk -v OFS="\t" '$1=$1' ref_results_gain3 > ref_results_gain4 # Replace with tabs again! 
+datamash -s crosstab 1,2 unique 3 < ref_results_gain4 > ref_results_gain5 # Good now we want the first value before , 
+sed -i 's/,/\t/g' ref_results_gain5
+cat ref_results_gain5 | awk '{ print $1, $3, $5, $7 }' > ref_results_gain6 # get the proper columns # Ref, test 
+sed -i 's/Reference Unclassified/Gene Reference Test Unclassified/g' ref_results_gain6
+
+## Add the two files together 
+## Save copy 
+cp gene_results_gain3 gain_p
+cp ref_results_gain6 gain_ratios
+
+## Sort 
+sort -n -k 1 gain_p > gain_p2
+sort -n -k 1 gain_ratios > gain_ratios2
+
+## Join 
+    
+join -a1 -a2 -e 1 -o auto gain_p2 gain_ratios2 > gain_results
+awk -v OFS="\t" '$1=$1' gain_results > gain_results2 # Insert tabs 
+cat gain_results2 | awk '{ print $1, $2, $3, $4, $5 }' > gain_results3 # Select the right rows 
+sed 's/$/ gain/' gain_results3 >gain_results4 # add gain 
+sed -i 's/Gene pvalue Reference Test Unclassified gain/Gene pvalue Mutualist Free Unclassified Transition/g' gain_results4 # rename headers
+sed 's/ /,/g' gain_results4 > loss_results_final.csv # Comma for csv file 
+sed -i 's/gain/loss/g' loss_results_final.csv
+
+## These are the good data for the gains
+## in R can filter for the significant ones and then plot the differences! And repeat for the losses and look at those separately 
+
+
+## Do all the species together
+## Since loss and gain are not for sure we can do all species in one analysis
+
+## P values 
+grep -o '^\Likelihood ratio test.*' *.out > gene_results_full
+awk -v OFS="\t" '$1=$1'  gene_results_full >  gene_results_full2 # replace space with tabs
+sed -i 's/\*\*\.//g' gene_results_full2
+sed -i 's/_relax.out:Likelihood//g' gene_results_full2
+cat gene_results_full2 | awk '{ print $1, $6 }' > gene_results_full3 
+sed -i '1 i\Gene pvalue' gene_results_full3 
+
+## Ratios 
+grep -E 'non-synonymous/synonymous rate ratio for' *.out > ref_results_full
+sed -i 's/\*//g' ref_results_full
+sed -i 's/_relax.out://g' ref_results_full # Clean the data 
+awk -v OFS="\t" '$1=$1' ref_results_full > ref_results_full2 # replace space with tabs
+cat ref_results_full2 | awk '{ print $1, $6, $8 }' > ref_results_full3
+awk -v OFS="\t" '$1=$1' ref_results_full3 > ref_results_full4 # Replace with tabs again! 
+datamash -s crosstab 1,2 unique 3 < ref_results_full4 > ref_results_full5 # Good now we want the first value before , 
+sed -i 's/,/\t/g' ref_results_full5
+cat ref_results_full5 | awk '{ print $1, $3, $5, $7 }' > ref_results_full6 # get the proper columns # Ref, test 
+sed -i 's/Reference Unclassified/Gene Reference Test Unclassified/g' ref_results_full6
+
+## Save copy 
+cp gene_results_full3 full_p
+cp ref_results_full6 full_ratios
+
+## Sort 
+sort -n -k 1 full_p > full_p2
+sort -n -k 1 full_ratios > full_ratios2
+
+## Join 
+    
+join -a1 -a2 -e 1 -o auto full_p2 full_ratios2 > full_results
+awk -v OFS="\t" '$1=$1' full_results > full_results2 # Insert tabs 
+cat full_results2 | awk '{ print $1, $2, $3, $4, $5 }' > full_results3 # Select the right rows 
+sed -i 's/Gene pvalue Reference Test Unclassified gain/Gene pvalue Free Mutualist Unclassified Transition/g' full_results3 # rename headers
+sed 's/ /,/g' full_results3 > full_results_relax.csv # Comma for csv file 
+
+
+## Map the symbiosis genes to the transcriptomes? 
+## Then maybe look at which ones were successful at mapping and focus in on those 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Add the labels to the tree
+
+for file in *.tree
+do 
+sed -i -e 's/Calliandra_eriophylla_.*p1:/Calliandra_eriophylla{mutualist}:/g 
+	   	  s/Calliandra_humilis_.*p1:/Calliandra_humilis{free}:/g
+	      s/Mimosa_aculeaticarpa_.*p1:/Mimosa_aculeaticarpa{mutualist}:/g
+	      s/Mimosa_grahamii_.*p1:/Mimosa_grahamii{free}:/g
+	      s/Dalea_mollis_.*p1:/Dalea_mollis{free}:/g
+	      s/Dalea_mollissima_.*p1:/Dalea_mollissima{mutualist}:/g
+	      s/Senna_barclayana_.*p1:/Senna_barclayana{mutualist}:/g
+	      s/Senna_occidentalis_.*p1:/Senna_occidentalis{free}:/g
+	      s/Senna_didymobotrya_.*p1:/Senna_didymobotrya{free}:/g
+	      s/Senna_italica_.*p1:/Senna_italica{mutualist}:/g
+	      s/Peltophorum_africanum_.*p1:/Peltophorum_africanum{mutualist}:/g
+	      s/Peltophorum_dubium_.*p1:/Peltophorum_dubium{free}:/g' $file
+done
+
+## Add labels to the fas alignment 
+
+for file in *.fas
+do 
+sed -i -e 's/Calliandra_eriophylla.*p1/Calliandra_eriophylla{mutualist}/g 
+	   	  s/Calliandra_humilis.*p1/Calliandra_humilis{free}/g
+	      s/Mimosa_aculeaticarpa.*p1/Mimosa_aculeaticarpa{mutualist}/g
+	      s/Mimosa_grahamii.*p1/Mimosa_grahamii{free}/g
+	      s/Dalea_mollis_.*p1/Dalea_mollis{free}/g
+	      s/Dalea_mollissima.*p1/Dalea_mollissima{mutualist}/g
+	      s/Senna_barclayana.*p1/Senna_barclayana{mutualist}/g
+	      s/Senna_occidentalis.*p1/Senna_occidentalis{free}/g
+	      s/Senna_didymobotrya.*p1/Senna_didymobotrya{free}/g
+	      s/Senna_italica.*p1/Senna_italica{mutualist}/g
+	      s/Peltophorum_africanum.*p1/Peltophorum_africanum{mutualist}/g
+	      s/Peltophorum_dubium.*p1/Peltophorum_dubium{free}/g' $file
+done
+
+
+sed -i 's/{free}//g' OG0020677.best.fas
+sed -i 's/{mutualist}//g' OG0020677.best.fas
+
+## List directories in current directory 
+ls -d */
+
+## Run RELAX model in Hyphy 
+## Change fas to newick file, might not be necessary  
+seqmagick convert --output-format nexus --alphabet dna OG0020677.best.fas OG0020677.nex
+
+
+## Ugh I almost want to redo the tree after renaming the file! 
+## IT is messing up the tree file when I go to rename and try to put in the labels - it is taking out a lot of the names 
+
+## Rename the phy file and redo tree ugh! 
+
+for file in *.phy
+do 
+sed -i -e 's/Calliandra_eriophylla.*p1/Calliandra_eriophylla{mutualist}/g 
+	   	  s/Calliandra_humilis.*p1/Calliandra_humilis{free}/g
+	      s/Mimosa_aculeaticarpa.*p1/Mimosa_aculeaticarpa{mutualist}/g
+	      s/Mimosa_grahamii.*p1/Mimosa_grahamii{free}/g
+	      s/Dalea_mollis_.*p1/Dalea_mollis1{free}/g
+	      s/Dalea_mollissima.*p1/Dalea_mollissima{mutualist}/g
+	      s/Senna_barclayana.*p1/Senna_barclayana{mutualist}/g
+	      s/Senna_occidentalis.*p1/Senna_occidentalis{free}/g
+	      s/Senna_didymobotrya.*p1/Senna_didymobotrya{free}/g
+	      s/Senna_italica.*p1/Senna_italica{mutualist}/g
+	      s/Peltophorum_africanum.*p1/Peltophorum_africanum{mutualist}/g
+	      s/Peltophorum_dubium.*p1/Peltophorum_dubium{free}/g' $file
+done
+
+raxmlHPC-SSE3 -f a -# 20 -m GTRCATX -p 1234 -x1234 -s OG0020513.best.fas.phy -n OG0020513.best.fas.phy.tree
+
+sed -i 's/{free}//g' OG0020513.best.fas.phy
+sed -i 's/{mutualist}//g' OG0020513.best.fas.phy
+
+hyphy RELAX --alignment OG0020513.best.fas.phy --tree RAxML_bestTree.OG0020513.best.fas.phy.tree --test mutualist --reference free
+
+
+
+OG0020513.best.fas.phy
+RAxML_bestTree.OG0020513.best.fas.phy.tree
+Peltophorum_africanum{mutualist}
+Peltophorum_africanum{mutualist}
+
+
