@@ -22,21 +22,13 @@ for f in *faa ; do python /ohta/tia.harrison/src/OrthoFinder/tools/primary_trans
 
 nohup orthofinder -f primary_transcripts/ & 
 
-## Then logout and close 
-## Log back in and check that the program is running 
-
-ps -u tia.harrison
-
 ## Read some summary stats from the nohup file - how many genes were assigned to how many orthogroups 
 ## You want to see at least 80% of your genes assigned to orthogroups 
 ## Check summary statistics per species to see if all species contributed about the same number of genes to orthologs 
 
-
 ## Results with 30 species in orthofinder 
 ## 170631 genes (93.8% of total) assigned to 14224 orthogroups
 ## 810 orthogroups with all species present and 387 of those were single copy genes 
-
-
 
 ## Some species might have several genes assigned to one ortholog where as some species have just one
 ## The Orthogroups results folder will include both orthologs and paralogs so just use codes from Single Copy Orthologues result file 
@@ -60,14 +52,11 @@ sed -i 's/prot/cds/g' OrthologsIDS.txt
 ## Using the ID codes, extract the genes from the CDS files to get the nucleotide code rather than back-translating or using amino acid sequences
 ## Take the first column of the header in the fasta file to clean up the header IDs 
 
-
-
 ## Test the code 
 awk '{print $1}' Cupriavidus_necator.fna > Cupriavidus_necator2.fna
 awk '{print $1}' Cupriavidus_oxalaticus.fna > Cupriavidus_oxalaticus2.fna
 awk '{print $1}' Methylobacterium_nodulans.fna > Methylobacterium_nodulans2.fna
 awk '{print $1}' Methylorubrum_extorquens.fna > Methylorubrum_extorquens2.fna
-
 
 ## Put in a script and run on everything using bash 
 awk '{print $1}' Agrobacterium_vitis.fna > Agrobacterium_vitis2.fna
@@ -280,7 +269,6 @@ done
 
 ## Maybe try multithreading with raxmlHPC-PTHREADS-SSE3
 
-## Unclear which tree to use in PAML, the one with just bootstrap in the title is good for viewing in FigTree 
 ## For PAML you might want to use branchlengths in the tree too 
 ## Move the files into new folder called PAML for next steps 
  
@@ -296,9 +284,9 @@ done
 
 ## Rubin and Moreau did a test in PAML on all genes by implementing the following conditions
 ## model=1 is the free-ratios model  (I think this is a w ratio for each branch - and then just take the ratios at the tip branches for the species), the manual says this is parameter rich and discouraged but this is the one I want 
-## They used the species tree as the input for tree but I think I will use the gene trees for each gene itself - or does that get away from the question? 
+## They used the species tree as the input for tree but I think I will use the gene trees for each gene itself 
 ## They put cleandata=1 to mask ambiguous data 
-## runmode=0 means it will use my tree (but then it does estimate multiple trees?) 
+## runmode=0 means it will use my tree
 ## NSites= 0 means there is no variation in dn/ds among sites (we just want variation among lineages) 
 ## CodonFreq=2 so that it estimates equilibrium codon freqs at three codon positions 
 ## clock=0 no clock 
@@ -492,14 +480,6 @@ do
 done
 
 
-
-
-# What I need to do now is go back and find the genes that were not in every single species but in enough to still use those orthologs 
-
-
-
-
-
 ## To find the genes that are involved in symbiosis and their orthologues go back to OrthoFinder folder 
 ## In the faa files search each genome for these key words that indicate a symbiosis function with plants 
 ## nod, noe, nol, nop, nfe, nodul, nif, fix, fixation, nitrogenase -- a la Epstein & Tiffin 2020  
@@ -570,7 +550,6 @@ do
 done 
 
 
-
 ## Then search the output files for each species to see which kinds of genes are orthologs of rhizobia
 ## These are in the primary_transcripts file
 ## This worked! Look in the primary_transcripts file for lists that end in _rhizogenes to see what the genes are 
@@ -624,7 +603,6 @@ while read a b c d e f g h i j k l m n o p q r s t u v w x y z ab ac ad ae af; d
 	cat Agrobacterium_vitis/*"$b"*.fa Azorhizobium_caulinodans/*"$c"*.fa Bradyrhizobium_betae/*"$d"*.fa Bradyrhizobium_japonicum/*"$e"*.fa Burkholderia_bannensis/*"$f"*.fa Burkholderia_cepacia/*"$g"*.fa Burkholderia_nodosa/*"$h"*.fa Burkholderia_seminalis/*"$i"*.fa Cupriavidus_necator/*"$j"*.fa Cupriavidus_oxalaticus/*"$k"*.fa Methylobacterium_extorquens/*"$l"*.fa Methylobacterium_nodulans/*"$m"*.fa Microvigra_flocculans/*"$n"*.fa Microvigra_lupini/*"$o"*.fa Ochrobactrum_anthropi/*"$p"*.fa Ochrobactrum_lupini/*"$q"*.fa Paraburkholderia_fungorum/*"$r"*.fa Paraburkholderia_graminis/*"$s"*.fa Paraburkholderia_kirstenboschensis/*"$t"*.fa Paraburkholderia_ribeironis/*"$u"*.fa Pseudorhizobium_pelagicum/*"$v"*.fa Rhizobium_daejeonense/*"$w"*.fa Rhizobium_leguminosarium/*"$x"*.fa Rhizobium_marinus/*"$y"*.fa Rhizobium_rosettiformans/*"$z"*.fa Rhizobium_undicola/*"$ab"*.fa Rhizobium_vignae/*"$ac"*.fa Shinella_kummerowiae/*"$ad"*.fa Shinella_zoogleoides/*"$ae"*.fa Xanthobacter_autotrophicus/*"$af"*.fa > Alignment_rhizobia2/"$a".fa
 done < test_original_file
 
-## Having trouble getting this while loop to work 
 ## Instead since it is only 14 genes pick out the files yourself and cat them 
 ## Look at the gene names in the excel sheet 
 ## Do this in the fasta folder 
@@ -872,188 +850,4 @@ cat *_final_table > All_orthos_w.txt
 
 # Add a tab between the dnds and gene name values 
 sed -i 's/ /\t/g' All_orthos_w.txt 
-
-
-
-
-
-# Now do the same thing for dN and dS separately 
-for f in *lineage.results 
-do 
-	sed -n '/dS tree:/{n;p;}' $f > ${f%%.*}_tree
-done 
-
-# For loop for second step in file called script2 
-for f in *_tree
-do 
-	sed -i 's/,/\n/g' $f
-	sed -i 's/(//g' $f
-	sed -i 's/)//g' $f
-	sed -i 's/;//g' $f
-	sed -i 's/ //g' $f
-	cut -f1,2 -d':' $f > ${f%%.*}_tree_NEW
-done 
-
-# Add the gene name to the last column 
-for f in *_tree_NEW
-do
-	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
-done 
-
-# Remove "_lineage_tree" from the last column of data in script4 
-for f in *_final_table
-do 
-	sed -i 's/_lineage_tree_tree_NEW//g' $f
-done 
-
-# Cat together all the result files into one file 
-cat *_tree_tree_NEW_final_table > All_orthos_dS.txt
-
-# Add a tab between the dnds and gene name values and insert tab into the colon character 
-sed -i 's/ /\t/g' All_orthos_dS.txt 
-sed -i 's/:/\t/g' All_orthos_dS.txt 
-
-
-
-
-
-
-
-
-
-## Find the paralogs across all the species
-## All orthologs are in the file Orthogroups.tsv
-## Pull out all lines that have , because those have multiple genes per orthogroup 
-
-grep "," Orthogroups.tsv > paralogs 
-wc -l paralogs # 5600 rows!! How should I do this??? 
-
-## Re-order the lines from most words to fewest words 
-awk '{print NF,$0}' paralogs | sort -nr | cut -d' ' -f 2- > paralogs3
-
-
-## Count the number of words per line 
-awk -F'[: \t]+' '{print NF}' paralogs3 > paralog_counts
-wc -l paralog_counts
-## 5600 total paralogs  
-
-## Count the number of lines greater than 5 (need to put in 4 because the first column has a header that takes up a word ) 
-awk '$1>4{c++} END{print c+0}' paralog_counts 
-
-
-## There are 5060 genes that have at least 4 species
-## But they are not all in order of highest to lowest count 
-
-head -5060 paralogs > paralogs_four.txt
-
-## Check out the number of counts 
-awk -F'[: \t]+' '{print NF}' paralogs_four.txt > counts_paralog_four
-
-## Now it's good 
-## Clean up the file 
-sed -i 's/prot/cds/g' paralogs_four.txt
-sed -i 's/lcl|//g' paralogs_four.txt
-
-## Now how to extract the multiple codes per column? 
-## Go to the Orthogroups_Sequences file which already has all the files in fasta format just not with the species name in the sequence names BUT i can change that later!!!! 
-## Get just the first column with the ortholog names to extract 
-## NNNNOOOOOOPEEEE Cant do this because these are the protein files!!!! Need to do the dnds calling on the fasta nucleotide files!!! OMG!!! 
-## Ugh, how can I extract multiple codes per fold, grrrrrrrrrrrrrr
-## Or pool all the sequences in one folder and have it just grab the codes from that!! Haha! Get rid of the , and change them all to tabs and pool all the sequences together 
-
-
-## Copy all the individual sequences to one big file 
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Xanthobacter_autotrophicus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Shinella_zoogleoides/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Shinella_kummerowiae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_vignae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_undicola/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_rosettiformans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_marinus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_leguminosarium/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Rhizobium_daejeonense/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Pseudorhizobium_pelagicum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_ribeironis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_kirstenboschensis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_graminis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Paraburkholderia_fungorum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Ochrobactrum_lupini/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Ochrobactrum_anthropi/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Microvigra_lupini/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Microvigra_flocculans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Methylobacterium_nodulans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Methylobacterium_extorquens/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Cupriavidus_oxalaticus/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Cupriavidus_necator/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_seminalis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_nodosa/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_cepacia/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Burkholderia_bannensis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Bradyrhizobium_japonicum/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Bradyrhizobium_betae/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Azorhizobium_caulinodans/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ &
-cp -r /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/Agrobacterium_vitis/* /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/Test4/fasta/All_species/ & 
-
-
-
-## Try filling in the empty fields 
-## Make a new file to test 
-cp paralogs_four.txt paralogs_four_test.txt
-
-## Take the file into excel and add a dummy column called test 
-
-## Replace , with tabs 
-sed -i 's/, /\t/g' paralogs_four_test_excel.txt
-
-
-## Count the number of columns 
-head -1 paralogs_four_test_excel.txt | tr '\t' '\n' | wc -l  # 1087 columns total!!! Holy moly!!! (-1 for the TEST column and -1 for gene name) 
- 
-
-## Replace tabs with spaces 
-sed 's/\t/ /g' paralogs_four_test_excel.txt > paralogs_four_test_excel2.txt
-
-## Remove lines that are less than 4 words (there are two extra columns-gene and TEST)
-awk 'NF>=6' paralogs_four_test_excel2.txt > paralogs_four_test_excel3.txt
-
-## Make separate file for just the codes 
-awk -F" " '{print $1}' paralogs_four_test_excel3.txt > paralogs_four_test_CODES.txt
-
-## Remove the first column 
-awk '{$1=" "}1' paralogs_four_test_excel3.txt | awk '{$1=$1}1' > paralogs_four_test_excel4.txt
-## The new paralog file has spaces after this step (if it didn't already have them before) 
-
-## Insert * characters at the end of each entry in the file by replacing spaces with *
-sed -i 's/ /* /g' paralogs_four_test_excel4.txt
-
-## Remove test from the file 
-sed -i 's/TEST*//g' paralogs_four_test_excel4.txt
-sed -i 's/TEST//g' paralogs_four_test_excel4.txt
-
-
-## Now cat together all the lines in one file and give it a name using the codes in the second file 
-## AlignmentsC folder is working so check the excel_fasta2 file for the code that worked 
-while read -r lineA && IFS= read -r lineB <&3; do
-  ls $lineA | xargs cat >> AlignmentsC/"$lineB".fa
-done <paralogs_four_test_excel4.txt 3<paralogs_four_test_CODES.txt
-
-
-## Count how many sequences in each file by counting number of >
-for f in *.fa; do
-	grep -o '>' $f | wc -l >> character_counts
-done
-
-## Count how many sequences in each line in the paralog file by counting the *
-awk -F\* '{print NF-1}' paralogs_four_test_excel4.txt > paralog_counts2
-## Or count the number of words 
-awk '{print NF}' paralogs_four_C.txt > paralog_counts
-
-## Now everything matches up very nicely 
-
-## Prank alignments 
-## Made different folders with different sets of files to make it go faster and do a version of parallelism 
-for f in *.fa 
-do 
-	prank -d=$f -o=${f%%.*} -codon -F 
-done 
 
