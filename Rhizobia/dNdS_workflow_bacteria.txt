@@ -3,7 +3,7 @@
 ## Citation for the program: Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. Genome Biology 20:238
 ## Downloaded the program from github: https://github.com/davidemms/OrthoFinder
 
-## Download the translated CDS file of all the bacteria genomes from Genbank to get the protein files and untar the files 
+## Download the translated CDS file of all the bacteria genomes from Genbank to get the protein files and untar the files  
 
 tar -xvf file_name.tar 
 gunzip file_name.tar 
