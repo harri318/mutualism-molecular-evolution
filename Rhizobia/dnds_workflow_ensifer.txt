@@ -13,7 +13,7 @@ find -type f -exec bash -c 'fp=$(dirname "$1");fn=$(basename "$fp");px="${1##*.}
 find . -name '*.faa' -exec cp {} /ohta/tia.harrison/MolecularProject/Rhizobia_pairs/SinoEnsiClade/sino_genomes_faa/ \;
 ls | wc -l # 104 files 
 
-## So all in all we have 104 genomes to compare (even though we lost some for the protein files but oh well pretty good) 
+## So all in all we have 104 genomes to compare
 
 ## Reduce the number of transcripts on the .faa files 
 
@@ -217,12 +217,7 @@ do
 done 
 
 
-## Submit and sub check 
-sbatch sino_paml_job.sh
-squeue -u harri318 # Submitted on Niagara 
 
-## This did not finish properly I dont think
-## Maybe this is way too much - try to just put one ratio for the mut and one ratio for the ref and see what that gives in the hyphy model instead 
 ## If there are pairs we can extract them and maybe do sister spp pair comparisons on those 
 
 ## Need to label the sequences based on mutualist or free living and do the hyphy test instead, free ratios might be way to complicated for sooo many samples 
@@ -427,56 +422,6 @@ sed -i 's/.best.fas.phy//g' OrthologNamesFile
 sed -i 's/GCA_002197125.1{mutualist}/GCA_002197125.1{free}/g' RAxML_bestTree* 
 ## Make sure to go back and change in the excel file - may have already done thsi not sure 
 
-## Run hyphy RELAX model! Just change the test and reference (but actually I don't think it matters)  
-
-vi hyphy_job.sh
-
-#!/bin/bash
-#SBATCH --nodes=15
-#SBATCH --ntasks-per-node=80 
-#SBATCH --time=24:00:00
-#SBATCH --job-name hyphy_sin
-#SBATCH --output=hyphy_sin_%j.txt
-
-module load NiaEnv/2019b intelpython3
-source activate myPythonEnv
-
-while read name; do 
-	hyphy RELAX --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree --test mutualist --reference free > "$name"_relax.out
-done < OrthologNamesFile
-
-## Copy the extra files to new folder 
-xargs -a extra_trees cp -t extra_hyphy
-
-remember to remove the 33333 files from previous folder 
-ls *.phy > OrthologNamesFile
-sed -i 's/.best.fas.phy//g' OrthologNamesFile
-
-## Copy again 
-xargs -a extra_extra cp -t extra_extra_hyphy
-
-## Okay now running hopefully the last of the sino genes for hyphy
-## Pick new pairs of rhizobia to do the paired wilcoxon tests on and then also look at plasmids vs the whole genome 
-
-## Run again! 
-sed -i 's/.best.fas.phy//g' new_list
-
-
-#!/bin/bash
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=40 
-#SBATCH --time=24:00:00
-#SBATCH --job-name hyphy_sin2
-#SBATCH --output=hyphy_sin2_%j.txt
-
-module load NiaEnv/2019b intelpython3
-source activate myPythonEnv
-
-while read name; do 
-	hyphy RELAX --alignment "$name".best.fas.phy --tree RAxML_bestTree."$name".tree --test mutualist --reference free > "$name"_relax.out
-done < new_list
-
-
 
 ## Make the tree 
 
@@ -592,7 +537,7 @@ do
 	awk '{print $0, FILENAME}' $f > ${f%%.*}_final_table
 done 
 
-# Remove crap from the last column of data in script4 
+# Remove stuff from the last column of data in script4 
 for f in *_final_table
 do 
 	sed -i 's/_tree2_2ratio_tree//g' $f
@@ -777,47 +722,6 @@ find /ohta/tia.harrison/ -type f -iname GCA_002197445.1.plasmid
 
 ## Get the codes for the chromosome and pSymA just in case 
 
-############ NEEEEEEEEED TOOOOOOOO STAAAAAAART HEEEEEEEERE ANNNNNND FIIIIIIIIIX THIIIIIIIIISSSSSSS ####################
-
-grep 'CP021803.1' new_GCA_002197445.1.fna > GCA_002197445.1.Aplasmid
-wc -l GCA_002197445.1.plasmid # 1963 genes for the plasmid 
-
-
-
-## Response: how distantly related are they? 
-## In general I think if your question is "do mutualists or non-mutualists have a faster rate of molecular evolution in these genes", then the variation across branch is less important than the average
-## and that two-rate model should get the averages
-## of course, it's possible that the averages could be inflated by just 1 or 2 species with really high w
-## Maybe try playing around with models that allow for more rate variation? Using likelihood ratios
-## For instance if a 3+ rate model isn't a better fit over your two-rate model according to AIC or BIC, then you're probably fine
-
-## make list of the new names 
-## Remove .best.fas.phy
-
-sed -i 's/.best.fas.phy//g' extra_names
-## Rerun the code to finish off those genes! 
-
-
-## Pick new pairs! Including from the Sino clade 
-## Gains of mutualism in the sinorhizobium clade 
-GCA_013283665.1 # mutualist in nm clade (gain) 
-GCA_001683495.1 # Non mutualist relative 
-
-
-## Losses of mutualism in the sinorhizobium clade 
-GCA_002885915.1 # Non mutualist in m clade (loss) 
-GCA_002807095.1 # mutualist 
-
-GCA_002892495.1 # Non mutualist in m clade (loss) 
-GCA_000510665.1 # Mutualist 
-
-GCA_003692735.1 # Non mutualist (losss) 
-GCA_000427745.1 # Mutualist 
-
-
-
-## Try the beta and alpha trees as well for hyphy tests 
-## Put these in capsicum 
 
 
 
