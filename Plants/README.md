@@ -16,6 +16,7 @@ dN/dS ratios for separate genes in each plant species in the datast
 
 ### Plant_rates.Rmd 
 R script for analyzing dN/dS ratios for genome-wide genes, symbiosis genes, and invasion data in mutualistic and non-mutualistic plant species 
+Running this code with all files in this directory will produce the results presented in the paper 
 
 ### Plant_rates.md 
 R script for analyzing dN/dS ratios for genome-wide genes, symbiosis genes, and invasion data in mutualistic and non-mutualistic plant species 
